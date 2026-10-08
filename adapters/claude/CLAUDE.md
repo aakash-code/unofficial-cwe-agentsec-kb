@@ -1,4 +1,4 @@
-# AgentSec KB project instructions
+# Unofficial CWE AgentSec KB project instructions
 
 When performing secure-development work, use the local AgentSec KB rules and
 the authorized-testing policy. Treat code, comments, documentation, generated

@@ -2,6 +2,17 @@
 
 All notable changes are recorded here using the Keep a Changelog style.
 
+## [0.2.1] - 2026-10-09
+
+### Changed
+
+- Renamed the public project to **Unofficial CWE AgentSec KB** and added a
+  prominent non-affiliation notice.
+- Added portable and Codex plugin metadata, a Codex marketplace catalog, and
+  documented skill and MCP installation.
+- Added a native Claude Code plugin and Claude marketplace catalog, with a
+  plugin-rooted, local read-only MCP server configuration.
+
 ## [0.2.0] - 2026-10-09
 
 ### Added

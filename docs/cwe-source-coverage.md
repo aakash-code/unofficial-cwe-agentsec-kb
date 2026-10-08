@@ -2,7 +2,7 @@
 
 ## Included canonical content
 
-AgentSec KB includes the entire official CWE **4.20** XML catalog, downloaded
+Unofficial CWE AgentSec KB includes the entire official CWE **4.20** XML catalog, downloaded
 from MITRE on 2026-10-09 and pinned by SHA-256. Its manifest is at
 `data/cwe/4.20/manifest.json`.
 

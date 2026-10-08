@@ -1,7 +1,13 @@
 {
-  "name": "agentsec-kb",
-  "version": "0.1.0",
-  "description": "Vendor-neutral, local secure-development guidance and safe source-review workflows for coding agents.",
-  "skills": "./adapters/codex/skills/",
-  "mcpServers": "./.mcp.json"
+  "name": "unofficial-cwe-agentsec-kb",
+  "version": "0.2.1",
+  "description": "Independent CWE-based security knowledge and authorized local review workflows for coding agents.",
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "onboardingSkill": "./skills/setup/SKILL.md",
+  "interface": {
+    "displayName": "Unofficial CWE AgentSec KB",
+    "shortDescription": "Independent CWE-based security knowledge for coding agents.",
+    "defaultPrompt": "Use secure-development-review to review this authorized local project."
+  }
 }

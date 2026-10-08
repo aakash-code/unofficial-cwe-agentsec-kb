@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "unofficial-cwe-agentsec-kb",
+  "version": "0.2.1",
+  "description": "Independent CWE-based security knowledge and authorized local review workflows for coding agents.",
+  "homepage": "https://github.com/aakash-code/unofficial-cwe-agentsec-kb",
+  "repository": "https://github.com/aakash-code/unofficial-cwe-agentsec-kb",
+  "license": "MIT",
+  "extensions": {
+    "com.openai": {
+      "onboardingSkill": "./skills/setup/SKILL.md",
+      "interface": {
+        "displayName": "Unofficial CWE AgentSec KB",
+        "shortDescription": "Independent CWE-based security knowledge for coding agents.",
+        "defaultPrompt": "Use secure-development-review to review this authorized local project."
+      }
+    }
+  }
+}

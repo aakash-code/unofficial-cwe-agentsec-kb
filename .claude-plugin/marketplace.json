@@ -1,0 +1,24 @@
+{
+  "name": "unofficial-cwe-agentsec",
+  "owner": {
+    "name": "Aakash",
+    "url": "https://github.com/aakash-code"
+  },
+  "description": "Independent CWE-based security knowledge and safe local review workflows for coding agents.",
+  "version": "0.2.1",
+  "plugins": [
+    {
+      "name": "unofficial-cwe-agentsec-kb",
+      "source": ".",
+      "description": "Independent CWE-based security knowledge, skills, and a local read-only MCP server.",
+      "version": "0.2.1",
+      "category": "security",
+      "tags": [
+        "security",
+        "cwe",
+        "secure-development",
+        "mcp"
+      ]
+    }
+  ]
+}

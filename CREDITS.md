@@ -1,6 +1,6 @@
 # Credits
 
-AgentSec KB is built on original project guidance and the work of the broader
+Unofficial CWE AgentSec KB is built on original project guidance and the work of the broader
 application-security community. We thank the following organizations and
 communities for the public standards and references that inform this project.
 
@@ -10,6 +10,8 @@ This project includes the complete official Common Weakness Enumeration (CWE™)
 4.20 XML distribution, maintained by The MITRE Corporation, and derived JSON
 representations that preserve its content. CWE is a trademark of The MITRE
 Corporation. Use of CWE content is subject to the [CWE Terms of Use](https://cwe.mitre.org/about/termsofuse.html).
+This independent project is not affiliated with, endorsed by, or maintained by
+MITRE or the CWE Program.
 
 ## OWASP Foundation
 

@@ -1,9 +1,12 @@
-AgentSec KB
-Copyright (c) 2026 AgentSec KB contributors
+Unofficial CWE AgentSec KB
+Copyright (c) 2026 Unofficial CWE AgentSec KB contributors
 
 This repository contains original guidance and references to third-party
 standards. A reference, identifier, URL, or compatibility mapping does not
 imply sponsorship, endorsement, affiliation, or approval by its publisher.
+
+This is an independent project. It is not affiliated with, endorsed by, or
+maintained by The MITRE Corporation, the CWE Program, DHS, or CISA.
 
 Common Weakness Enumeration (CWE™)
 -----------------------------------

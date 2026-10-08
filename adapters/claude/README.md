@@ -1,18 +1,25 @@
-# Claude Code integration
+# Claude Code (Anthropic) integration
 
-This directory provides portable project instructions rather than depending on
-a particular Claude Code plugin format. Copy `CLAUDE.md` into the root of a
-repository that should follow AgentSec KB review practices. If your Claude Code
-installation supports skill folders, copy the `skills/secure-development-review`
-directory using its documented project-skill location.
+The repository root is a native Claude Code plugin. Its manifest is in
+`.claude-plugin/plugin.json`; the marketplace catalog is in
+`.claude-plugin/marketplace.json`; root `skills/` contains the review workflow;
+and the plugin starts the bundled local MCP server with the plugin-root path.
 
-Optionally register this repository's local MCP server with your Claude Code
-environment using the command below, with the absolute repository path:
+Install it from GitHub:
 
-```text
-python3 /absolute/path/to/agentsec-kb/tools/agentsec.py serve
+```sh
+claude plugin marketplace add aakash-code/unofficial-cwe-agentsec-kb
+claude plugin install unofficial-cwe-agentsec-kb@unofficial-cwe-agentsec --scope project
 ```
 
-Review the server configuration and run `python3 tools/agentsec.py validate`
-before enabling it. The server is local and read-only, but it may inspect the
-directory supplied to its review tool.
+For a manual MCP-only installation, run the following from the repository root:
+
+```sh
+claude mcp add --scope project --transport stdio unofficial_cwe_agentsec_kb -- python3 "$PWD/tools/agentsec.py" serve
+claude mcp get unofficial_cwe_agentsec_kb
+```
+
+Review and approve project `.mcp.json` settings before use. The server is local
+and read-only, but its review tool can inspect the path you provide. Run
+`python3 tools/agentsec.py validate` before enabling it. For skill-only or
+instruction-only use, follow the corresponding steps in the root README.

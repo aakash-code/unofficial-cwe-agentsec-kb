@@ -1,0 +1,21 @@
+{
+  "name": "unofficial-cwe-agentsec",
+  "plugins": [
+    {
+      "name": "unofficial-cwe-agentsec-kb",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/aakash-code/unofficial-cwe-agentsec-kb.git",
+        "ref": "main"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "NONE"
+      },
+      "interface": {
+        "displayName": "Unofficial CWE AgentSec KB",
+        "shortDescription": "Independent CWE-based security knowledge for coding agents."
+      }
+    }
+  ]
+}

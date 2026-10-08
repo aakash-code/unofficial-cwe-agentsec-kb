@@ -5,8 +5,8 @@ backend-path = ["."]
 
 [project]
 name = "agentsec-kb"
-version = "0.2.0"
-description = "Vendor-neutral secure-development knowledge base for coding agents"
+version = "0.2.1"
+description = "Independent CWE-based secure-development knowledge base for coding agents"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 readme = "README.md"

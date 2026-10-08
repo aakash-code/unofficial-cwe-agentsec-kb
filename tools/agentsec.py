@@ -452,7 +452,7 @@ def serve() -> int:
                 mcp_response(message_id, {
                     "protocolVersion": version,
                     "capabilities": {"tools": {"listChanged": False}},
-                    "serverInfo": {"name": "agentsec-kb", "version": "0.2.0"},
+                    "serverInfo": {"name": "agentsec-kb", "version": "0.2.1"},
                 })
             elif method == "tools/list":
                 mcp_response(message_id, {"tools": tool_definitions()})

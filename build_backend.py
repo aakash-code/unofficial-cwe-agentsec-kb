@@ -13,7 +13,7 @@ import zipfile
 
 
 NAME = "agentsec_kb"
-VERSION = "0.2.0"
+VERSION = "0.2.1"
 DIST_INFO = f"{NAME}-{VERSION}.dist-info"
 ROOT = Path(__file__).resolve().parent
 INCLUDED_DIRECTORIES = ("tools", "knowledge", "mappings", "schemas", "policies", "data", "vendor")

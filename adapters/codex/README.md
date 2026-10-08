@@ -1,14 +1,19 @@
 # Codex integration
 
-AgentSec KB ships as a Codex plugin at the repository root. The plugin manifest
-loads the `secure-development-review` skill and starts the local MCP server
-with `python3 tools/agentsec.py serve` from the plugin root.
+Unofficial CWE AgentSec KB ships as a portable plugin at the repository root.
+`plugin.json`, `mcp.json`, and `skills/` follow the portable package layout;
+`.codex-plugin/plugin.json` and `.mcp.json` are Codex compatibility files. The
+plugin loads the `secure-development-review` skill and starts the local MCP
+server with `python3 tools/agentsec.py serve` from the plugin root.
 
 The plugin follows the official OpenAI plugin layout: a `.codex-plugin/plugin.json`
 manifest points to a skill directory and an `.mcp.json` server configuration.
 The skill is a directory with a `SKILL.md` manifest and instructions. See the
 [OpenAI plugin documentation](https://developers.openai.com/api/docs/guides/agents-api/tools/plugins)
 and [skills documentation](https://developers.openai.com/api/docs/guides/tools-skills).
+
+See the complete installation, marketplace, manual-skill, and MCP setup
+instructions in the root [README](../../README.md).
 
 ## Local use
 
@@ -34,4 +39,5 @@ python3 -m unittest discover -s tests -v
 - `agentsec_cwe_status` — verify CWE version, source, counts, and checksum.
 
 The `agentsec_review_path` tool does not execute code or contact networks. Its
-findings are leads for human review, not confirmed vulnerabilities.
+findings are leads for human review, not confirmed vulnerabilities. This is an
+independent project and is not an official CWE or MITRE product.
