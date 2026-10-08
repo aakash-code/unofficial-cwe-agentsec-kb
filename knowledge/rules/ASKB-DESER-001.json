@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-DESER-001",
+  "title": "Do not deserialize untrusted object formats",
+  "status": "stable",
+  "summary": "Object deserialization formats can invoke behavior or create unsafe state, so untrusted input must use constrained data formats and schemas.",
+  "applies_to": ["web-api", "worker", "service"],
+  "cwe_ids": ["CWE-502"],
+  "risk": "critical",
+  "review_checks": ["Find unsafe object deserializers applied to request, cache, queue, or file data.", "Verify authenticity and strict schemas where serialized data cannot be avoided."],
+  "safe_tests": ["Use local synthetic serialized fixtures only.", "Confirm malformed data is rejected without invoking application-defined behavior."],
+  "remediation": ["Use data-only formats with strict schemas.", "Authenticate serialized data and avoid deserializing objects from untrusted sources."],
+  "references": [{"source": "CWE", "id": "CWE-502", "url": "https://cwe.mitre.org/data/definitions/502.html"}],
+  "tags": ["deserialization", "data-format"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}

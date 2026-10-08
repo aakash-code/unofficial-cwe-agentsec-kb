@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use AgentSec KB, please cite the project and the external standards it references."
+title: "AgentSec KB"
+version: "0.2.0"
+date-released: "2026-10-09"
+license: "MIT"
+abstract: "Vendor-neutral secure-development knowledge base and local MCP tooling for AI coding agents."
+keywords:
+  - secure development
+  - coding agents
+  - MCP
+  - CWE

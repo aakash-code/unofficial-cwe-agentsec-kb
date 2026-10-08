@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-DEPS-001",
+  "title": "Maintain and verify third-party components",
+  "status": "stable",
+  "summary": "Dependencies and build artifacts need ownership, version visibility, timely updates, and integrity checks because vulnerable or abandoned components create inherited risk.",
+  "applies_to": ["all"],
+  "cwe_ids": ["CWE-1104"],
+  "risk": "high",
+  "review_checks": ["Identify lockfiles, vendored code, unpinned actions, and unsupported components.", "Check that an update and vulnerability-response process exists."],
+  "safe_tests": ["Generate an inventory from local manifests without uploading private source.", "Confirm CI can detect a deliberately outdated test dependency."],
+  "remediation": ["Use lockfiles, integrity verification, and an SBOM.", "Assign owners and routinely update or remove unsupported components."],
+  "references": [{"source": "CWE", "id": "CWE-1104", "url": "https://cwe.mitre.org/data/definitions/1104.html"}],
+  "tags": ["supply-chain", "dependencies"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}

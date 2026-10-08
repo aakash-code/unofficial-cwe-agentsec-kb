@@ -1,0 +1,32 @@
+AgentSec KB
+Copyright (c) 2026 AgentSec KB contributors
+
+This repository contains original guidance and references to third-party
+standards. A reference, identifier, URL, or compatibility mapping does not
+imply sponsorship, endorsement, affiliation, or approval by its publisher.
+
+Common Weakness Enumeration (CWE™)
+-----------------------------------
+CWE™ is a trademark of The MITRE Corporation. This project includes the
+official CWE 4.20 XML distribution and derived, lossless JSON representations.
+Copyright © 2006–2026, The MITRE Corporation. CWE content is included under
+the CWE Terms of Use: CWE is free to use for research, development, and
+commercial purposes; each copy must reproduce MITRE's copyright designation
+and license. The complete terms are available at:
+https://cwe.mitre.org/about/termsofuse.html
+
+OWASP
+-----
+This project may link to OWASP resources. No OWASP text is reproduced in this
+initial release. Contributors who add adapted OWASP material must include the
+required attribution and distribute that material under the applicable
+Creative Commons Attribution-ShareAlike terms; it must be clearly separated
+from MIT-licensed original project material.
+
+NIST
+----
+This project references NIST publications as informative sources. References
+are not an assertion of NIST endorsement. Preserve source citations and any
+applicable notices when importing NIST material.
+
+See CREDITS.md and SOURCES.md for the complete initial attribution register.

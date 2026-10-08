@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-AUTH-001",
+  "title": "Authorize every protected action and object",
+  "status": "stable",
+  "summary": "Authentication alone is insufficient; every protected action must verify that the caller is allowed to act on the requested resource.",
+  "applies_to": ["web-api", "service", "admin-interface"],
+  "cwe_ids": ["CWE-862"],
+  "risk": "critical",
+  "review_checks": ["List state-changing and sensitive read endpoints.", "Confirm policy checks happen server-side for the action and target object."],
+  "safe_tests": ["Use local test identities with distinct roles and object ownership.", "Confirm forbidden responses do not disclose protected data."],
+  "remediation": ["Centralize policy enforcement near protected operations.", "Default to deny and add tests for cross-user and cross-role access."],
+  "references": [{"source": "CWE", "id": "CWE-862", "url": "https://cwe.mitre.org/data/definitions/862.html"}],
+  "tags": ["authorization", "access-control"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}

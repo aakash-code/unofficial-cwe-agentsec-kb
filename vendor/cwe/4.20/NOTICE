@@ -1,0 +1,16 @@
+Official source: Common Weakness Enumeration (CWE™) Version 4.20
+Source archive: cwec_v4.20.xml.zip
+Source URL: https://cwe.mitre.org/data/xml/cwec_latest.xml.zip
+Source archive SHA-256: 3976f599e5e5200219a3108bb896d06e2a88fbb293369e1883cb423a5e9d7d50
+
+Copyright © 2006–2026, The MITRE Corporation. CWE™, CWSS™, CWRAF™, and the
+CWE logo are trademarks of The MITRE Corporation.
+
+CWE is free to use by any organization or individual for research,
+development, and commercial purposes. Any copy must reproduce MITRE's
+copyright designation and the CWE license. See the complete terms at:
+https://cwe.mitre.org/about/termsofuse.html
+
+The files in ../../../../data/cwe/4.20 are derived losslessly from this official
+source archive by ../../../../tools/import_cwe.py. Their integrity metadata is
+in ../../../../data/cwe/4.20/manifest.json.

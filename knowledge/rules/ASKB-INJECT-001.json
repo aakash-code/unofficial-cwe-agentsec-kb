@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-INJECT-001",
+  "title": "Separate data from database query structure",
+  "status": "stable",
+  "summary": "Database query structure must be fixed separately from untrusted values so input cannot alter the intended query semantics.",
+  "applies_to": ["web-api", "service", "database"],
+  "cwe_ids": ["CWE-89"],
+  "risk": "critical",
+  "review_checks": ["Find dynamic query construction that includes request or user-controlled values.", "Confirm parameter binding is used for values and allowlists are used for dynamic identifiers."],
+  "safe_tests": ["Use a disposable local database and test inputs containing quotes and operators.", "Verify data is treated as a value, not query syntax."],
+  "remediation": ["Use the database driver's parameterized-query interface.", "For unavoidable dynamic identifiers, map a small allowlist to fixed query fragments."],
+  "references": [{"source": "CWE", "id": "CWE-89", "url": "https://cwe.mitre.org/data/definitions/89.html"}],
+  "tags": ["injection", "database"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}

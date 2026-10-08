@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-INJECT-002",
+  "title": "Avoid shell interpretation of untrusted values",
+  "status": "stable",
+  "summary": "Programs must not pass untrusted values through a shell because metacharacters can change the executed command.",
+  "applies_to": ["cli", "worker", "service"],
+  "cwe_ids": ["CWE-78"],
+  "risk": "critical",
+  "review_checks": ["Find shell execution APIs and shell-enabled subprocess calls.", "Trace whether arguments can originate from a request, file, environment, or external service."],
+  "safe_tests": ["Test only in a local disposable environment with harmless marker arguments.", "Confirm the program passes an argument array without shell parsing."],
+  "remediation": ["Use direct process APIs with a fixed executable and argument array.", "Remove the shell dependency or map user choices to a fixed allowlist."],
+  "references": [{"source": "CWE", "id": "CWE-78", "url": "https://cwe.mitre.org/data/definitions/78.html"}],
+  "tags": ["injection", "command-execution"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}

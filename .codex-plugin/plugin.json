@@ -1,0 +1,7 @@
+{
+  "name": "agentsec-kb",
+  "version": "0.1.0",
+  "description": "Vendor-neutral, local secure-development guidance and safe source-review workflows for coding agents.",
+  "skills": "./adapters/codex/skills/",
+  "mcpServers": "./.mcp.json"
+}

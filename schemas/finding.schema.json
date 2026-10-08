@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentsec-kb.org/schemas/finding.schema.json",
+  "title": "AgentSec KB finding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "rule_id", "title", "severity", "confidence", "cwe_ids", "evidence", "impact", "safe_verification", "remediation", "disposition"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^ASKB-F-[0-9]{4,}$"},
+    "rule_id": {"type": "string", "pattern": "^ASKB-[A-Z]+-[0-9]{3}$"},
+    "title": {"type": "string"},
+    "severity": {"enum": ["low", "medium", "high", "critical"]},
+    "confidence": {"enum": ["low", "medium", "high"]},
+    "cwe_ids": {"type": "array", "items": {"type": "string", "pattern": "^CWE-[0-9]+$"}, "minItems": 1},
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "line", "snippet"],
+      "properties": {
+        "path": {"type": "string"},
+        "line": {"type": "integer", "minimum": 1},
+        "snippet": {"type": "string", "maxLength": 500}
+      }
+    },
+    "impact": {"type": "string"},
+    "safe_verification": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "remediation": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "references": {"type": "array", "items": {"type": "object"}},
+    "disposition": {"enum": ["needs-human-review", "accepted-risk", "fixed", "false-positive"]}
+  }
+}

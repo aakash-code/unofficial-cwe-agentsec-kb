@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-PATH-001",
+  "title": "Constrain file paths to an approved base directory",
+  "status": "stable",
+  "summary": "File names and paths influenced by untrusted input must be normalized and verified to remain within an approved storage boundary.",
+  "applies_to": ["web-api", "cli", "worker"],
+  "cwe_ids": ["CWE-22"],
+  "risk": "high",
+  "review_checks": ["Find file reads, writes, archives, and path joins using request or user values.", "Confirm canonicalized paths are checked against a fixed base directory."],
+  "safe_tests": ["Use a temporary local directory and test nested, absolute, and traversal-like path inputs.", "Confirm attempts outside the temporary base are rejected."],
+  "remediation": ["Use generated server-side identifiers for stored files.", "Resolve paths and enforce containment before accessing the filesystem."],
+  "references": [{"source": "CWE", "id": "CWE-22", "url": "https://cwe.mitre.org/data/definitions/22.html"}],
+  "tags": ["filesystem", "path-validation"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}

@@ -1,0 +1,19 @@
+[build-system]
+requires = []
+build-backend = "build_backend"
+backend-path = ["."]
+
+[project]
+name = "agentsec-kb"
+version = "0.2.0"
+description = "Vendor-neutral secure-development knowledge base for coding agents"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+readme = "README.md"
+keywords = ["security", "mcp", "coding-agents", "cwe", "secure-development"]
+
+[project.scripts]
+agentsec = "tools.agentsec:main"
+
+[tool.unittest]
+start-directory = "tests"

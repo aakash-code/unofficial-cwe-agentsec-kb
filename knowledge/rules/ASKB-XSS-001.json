@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-XSS-001",
+  "title": "Encode untrusted data for its output context",
+  "status": "stable",
+  "summary": "Untrusted data rendered into HTML, attributes, URLs, scripts, or templates must use the context-appropriate safe rendering mechanism.",
+  "applies_to": ["web-ui", "server-rendered-ui", "web-api"],
+  "cwe_ids": ["CWE-79"],
+  "risk": "high",
+  "review_checks": ["Find raw HTML sinks and template escape bypasses.", "Check whether data can come from users, stored content, or upstream APIs."],
+  "safe_tests": ["Use harmless local strings that exercise HTML and attribute escaping.", "Confirm the rendered result is data rather than executable markup."],
+  "remediation": ["Prefer framework auto-escaping and safe DOM APIs.", "Sanitize only when HTML is a deliberate feature and define a strict allowlist."],
+  "references": [{"source": "CWE", "id": "CWE-79", "url": "https://cwe.mitre.org/data/definitions/79.html"}],
+  "tags": ["xss", "output-encoding"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}

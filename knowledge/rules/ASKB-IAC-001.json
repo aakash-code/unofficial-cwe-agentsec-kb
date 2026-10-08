@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-IAC-001",
+  "title": "Make infrastructure access explicit and least-privileged",
+  "status": "stable",
+  "summary": "Infrastructure and cloud configuration should grant only the specific identities, actions, resources, networks, and exposure required for the intended service.",
+  "applies_to": ["iac", "cloud", "container"],
+  "cwe_ids": ["CWE-284"],
+  "risk": "high",
+  "review_checks": ["Find wildcard permissions, public exposure, broad security groups, and default identities.", "Verify each privilege has a documented workload need."],
+  "safe_tests": ["Evaluate configuration in a local plan or sandbox account only.", "Use policy tests that assert denied access for unapproved actions."],
+  "remediation": ["Replace wildcards with scoped actions and resource constraints.", "Use private-by-default network boundaries and separate workload identities."],
+  "references": [{"source": "CWE", "id": "CWE-284", "url": "https://cwe.mitre.org/data/definitions/284.html"}],
+  "tags": ["iac", "cloud", "access-control"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}

@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Reference-only mappings from AgentSec KB rules to official CWE identifiers. No CWE descriptions are redistributed.",
+  "source": {
+    "name": "Common Weakness Enumeration (CWE™)",
+    "url": "https://cwe.mitre.org/",
+    "terms": "https://cwe.mitre.org/about/termsofuse.html"
+  },
+  "mappings": [
+    {"rule_id": "ASKB-INPUT-001", "cwe_id": "CWE-20", "url": "https://cwe.mitre.org/data/definitions/20.html"},
+    {"rule_id": "ASKB-INJECT-001", "cwe_id": "CWE-89", "url": "https://cwe.mitre.org/data/definitions/89.html"},
+    {"rule_id": "ASKB-INJECT-002", "cwe_id": "CWE-78", "url": "https://cwe.mitre.org/data/definitions/78.html"},
+    {"rule_id": "ASKB-AUTH-001", "cwe_id": "CWE-862", "url": "https://cwe.mitre.org/data/definitions/862.html"},
+    {"rule_id": "ASKB-SECRETS-001", "cwe_id": "CWE-798", "url": "https://cwe.mitre.org/data/definitions/798.html"},
+    {"rule_id": "ASKB-CRYPTO-001", "cwe_id": "CWE-295", "url": "https://cwe.mitre.org/data/definitions/295.html"},
+    {"rule_id": "ASKB-XSS-001", "cwe_id": "CWE-79", "url": "https://cwe.mitre.org/data/definitions/79.html"},
+    {"rule_id": "ASKB-PATH-001", "cwe_id": "CWE-22", "url": "https://cwe.mitre.org/data/definitions/22.html"},
+    {"rule_id": "ASKB-DESER-001", "cwe_id": "CWE-502", "url": "https://cwe.mitre.org/data/definitions/502.html"},
+    {"rule_id": "ASKB-DEPS-001", "cwe_id": "CWE-1104", "url": "https://cwe.mitre.org/data/definitions/1104.html"},
+    {"rule_id": "ASKB-IAC-001", "cwe_id": "CWE-284", "url": "https://cwe.mitre.org/data/definitions/284.html"},
+    {"rule_id": "ASKB-LOG-001", "cwe_id": "CWE-532", "url": "https://cwe.mitre.org/data/definitions/532.html"}
+  ]
+}

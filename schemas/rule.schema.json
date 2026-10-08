@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentsec-kb.org/schemas/rule.schema.json",
+  "title": "AgentSec KB rule",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "status", "summary", "applies_to", "cwe_ids", "risk", "review_checks", "safe_tests", "remediation", "references", "provenance"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^ASKB-[A-Z]+-[0-9]{3}$"},
+    "title": {"type": "string", "minLength": 8},
+    "status": {"enum": ["draft", "stable", "deprecated"]},
+    "summary": {"type": "string", "minLength": 20},
+    "applies_to": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "cwe_ids": {"type": "array", "items": {"type": "string", "pattern": "^CWE-[0-9]+$"}, "minItems": 1, "uniqueItems": true},
+    "risk": {"enum": ["low", "medium", "high", "critical"]},
+    "review_checks": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "safe_tests": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "remediation": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "references": {"type": "array", "items": {"$ref": "#/$defs/reference"}, "minItems": 1},
+    "tags": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "provenance": {"$ref": "#/$defs/provenance"}
+  },
+  "$defs": {
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "id", "url"],
+      "properties": {
+        "source": {"type": "string"},
+        "id": {"type": "string"},
+        "url": {"type": "string", "format": "uri"}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin", "last_reviewed"],
+      "properties": {
+        "origin": {"enum": ["original", "adapted", "imported"]},
+        "last_reviewed": {"type": "string", "format": "date"},
+        "source_record": {"type": "string"}
+      }
+    }
+  }
+}

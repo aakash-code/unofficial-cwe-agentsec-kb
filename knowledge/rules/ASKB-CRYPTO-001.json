@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-CRYPTO-001",
+  "title": "Verify peer identity for encrypted connections",
+  "status": "stable",
+  "summary": "Transport encryption must validate the peer certificate and hostname so encryption does not silently connect to an untrusted endpoint.",
+  "applies_to": ["web-api", "service", "client"],
+  "cwe_ids": ["CWE-295"],
+  "risk": "high",
+  "review_checks": ["Find disabled certificate verification and permissive TLS callbacks.", "Confirm development exceptions cannot reach production configuration."],
+  "safe_tests": ["Use local test certificates and an untrusted test issuer.", "Confirm the connection fails when verification is enabled."],
+  "remediation": ["Enable default certificate and hostname verification.", "Use explicit trust configuration only for scoped test environments."],
+  "references": [{"source": "CWE", "id": "CWE-295", "url": "https://cwe.mitre.org/data/definitions/295.html"}],
+  "tags": ["tls", "cryptography"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}

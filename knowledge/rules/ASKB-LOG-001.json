@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-LOG-001",
+  "title": "Keep sensitive values out of logs and error responses",
+  "status": "stable",
+  "summary": "Logs, traces, telemetry, and client-facing error responses must not expose secrets, credentials, tokens, personal data, or internal security details.",
+  "applies_to": ["all"],
+  "cwe_ids": ["CWE-532"],
+  "risk": "medium",
+  "review_checks": ["Find logging of request bodies, authorization headers, tokens, passwords, and exception internals.", "Check error handling distinguishes client-safe messages from diagnostic logs."],
+  "safe_tests": ["Use synthetic sensitive markers in local tests.", "Assert the marker is redacted from logs and responses."],
+  "remediation": ["Use structured allowlist logging with redaction.", "Return generic client errors and retain constrained diagnostics for authorized operators."],
+  "references": [{"source": "CWE", "id": "CWE-532", "url": "https://cwe.mitre.org/data/definitions/532.html"}],
+  "tags": ["logging", "privacy", "secrets"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}

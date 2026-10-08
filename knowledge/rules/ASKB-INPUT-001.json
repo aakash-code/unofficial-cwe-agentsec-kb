@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-INPUT-001",
+  "title": "Constrain untrusted input at trust boundaries",
+  "status": "stable",
+  "summary": "Inputs from users, files, requests, queues, and integrations should be parsed and constrained before they influence application behavior.",
+  "applies_to": ["web-api", "cli", "worker", "service"],
+  "cwe_ids": ["CWE-20"],
+  "risk": "high",
+  "review_checks": ["Identify each trust boundary.", "Check type, size, format, range, and allowed-value validation before sensitive use."],
+  "safe_tests": ["Use local malformed, boundary, and unexpected-type test inputs.", "Confirm rejection is explicit and does not expose internals."],
+  "remediation": ["Use typed parsing and allowlists at the boundary.", "Keep validation close to input handling and test failure paths."],
+  "references": [{"source": "CWE", "id": "CWE-20", "url": "https://cwe.mitre.org/data/definitions/20.html"}],
+  "tags": ["input-validation", "trust-boundary"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}
