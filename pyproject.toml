@@ -13,7 +13,7 @@ readme = "README.md"
 keywords = ["security", "mcp", "coding-agents", "cwe", "secure-development"]
 
 [project.scripts]
-agentsec = "tools.agentsec:main"
+agentsec = "agentsec_kb.tools.agentsec:main"
 
 [tool.unittest]
 start-directory = "tests"

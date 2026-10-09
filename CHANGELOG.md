@@ -52,6 +52,10 @@ All notable changes are recorded here using the Keep a Changelog style.
   longer matches.
 - The reviewer prunes skipped directories such as `node_modules` instead of
   walking them.
+- `pip install` now places everything under a single `agentsec_kb` package
+  (plus its dist-info). It no longer puts top-level `tools/`, `data/`,
+  `knowledge/`, and license files into site-packages, where they could clash
+  with other packages. The `agentsec` command and repository layout are unchanged.
 - The MCP server answers malformed or non-object messages with JSON-RPC errors
   instead of crashing, and uses UTF-8 stdio on every platform.
 

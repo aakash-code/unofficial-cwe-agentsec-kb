@@ -145,6 +145,18 @@ class AgentSecTests(unittest.TestCase):
         versions["marketplace plugin"] = marketplace["plugins"][0]["version"]
         self.assertEqual(len(set(versions.values())), 1, versions)
 
+    def test_wheel_installs_everything_under_one_package(self):
+        import zipfile
+        sys.path.insert(0, str(PROJECT_ROOT))
+        import build_backend
+        with tempfile.TemporaryDirectory() as directory:
+            names = zipfile.ZipFile(Path(directory, build_backend.build_wheel(directory))).namelist()
+        top_level = {name.split("/")[0] for name in names}
+        self.assertEqual(top_level, {"agentsec_kb", build_backend.DIST_INFO})
+        self.assertIn("agentsec_kb/tools/agentsec.py", names)
+        self.assertIn("agentsec_kb/data/cwe/4.20/catalog.json", names)
+        self.assertIn("agentsec_kb/vendor/cwe/4.20/cwec_v4.20.xml.zip", names)
+
     def test_mcp_initialize_and_list_tools(self):
         process = subprocess.Popen(
             [sys.executable, str(PROJECT_ROOT / "tools" / "agentsec.py"), "serve"],

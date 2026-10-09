@@ -18,6 +18,10 @@ DIST_INFO = f"{NAME}-{VERSION}.dist-info"
 ROOT = Path(__file__).resolve().parent
 INCLUDED_DIRECTORIES = ("tools", "knowledge", "mappings", "schemas", "policies", "data", "vendor")
 INCLUDED_FILES = ("LICENSE", "NOTICE", "CREDITS.md", "SOURCES.md")
+# Everything installs under one package so generic names like tools/ and data/ never land at the top of
+# site-packages. tools/agentsec.py finds its data relative to itself, so the nesting needs no code change.
+PACKAGE = NAME
+ENTRY_POINTS = f"[console_scripts]\nagentsec = {PACKAGE}.tools.agentsec:main\n"
 
 
 def _metadata() -> str:
@@ -52,7 +56,7 @@ def _write_metadata(target: Path) -> str:
     dist_info.mkdir(parents=True, exist_ok=True)
     (dist_info / "METADATA").write_text(_metadata(), encoding="utf-8")
     (dist_info / "WHEEL").write_text(_wheel(), encoding="utf-8")
-    (dist_info / "entry_points.txt").write_text("[console_scripts]\nagentsec = tools.agentsec:main\n", encoding="utf-8")
+    (dist_info / "entry_points.txt").write_text(ENTRY_POINTS, encoding="utf-8")
     return DIST_INFO
 
 
@@ -71,12 +75,14 @@ def build_wheel(wheel_directory, config_settings=None, metadata_directory=None):
     for directory in INCLUDED_DIRECTORIES:
         for source_path in sorted((ROOT / directory).rglob("*")):
             if source_path.is_file() and "__pycache__" not in source_path.parts:
-                entries[str(source_path.relative_to(ROOT))] = source_path.read_bytes()
+                entries[f"{PACKAGE}/{source_path.relative_to(ROOT).as_posix()}"] = source_path.read_bytes()
     for relative_path in INCLUDED_FILES:
-        entries[relative_path] = (ROOT / relative_path).read_bytes()
+        entries[f"{PACKAGE}/{relative_path}"] = (ROOT / relative_path).read_bytes()
+    entries[f"{PACKAGE}/__init__.py"] = b'"""Unofficial CWE AgentSec KB data and tools."""\n'
+    entries[f"{DIST_INFO}/licenses/LICENSE"] = (ROOT / "LICENSE").read_bytes()
     entries[f"{DIST_INFO}/METADATA"] = _metadata().encode("utf-8")
     entries[f"{DIST_INFO}/WHEEL"] = _wheel().encode("utf-8")
-    entries[f"{DIST_INFO}/entry_points.txt"] = b"[console_scripts]\nagentsec = tools.agentsec:main\n"
+    entries[f"{DIST_INFO}/entry_points.txt"] = ENTRY_POINTS.encode("utf-8")
     record = [_record_line(path, data) for path, data in entries.items()]
     record.append(f"{DIST_INFO}/RECORD,,")
     entries[f"{DIST_INFO}/RECORD"] = ("\n".join(record) + "\n").encode("utf-8")
