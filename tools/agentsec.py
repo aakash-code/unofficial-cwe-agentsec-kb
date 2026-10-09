@@ -346,9 +346,15 @@ def contains_phrase(haystack: str, phrase: str) -> bool:
 
 
 def search_cwe(query: str, limit: int = 10) -> list[dict[str, Any]]:
-    normalized_query = query.strip().upper()
+    usage = cwe_mapping_usage()
+    # An ID in any spelling (CWE-89, cwe 89, CWE_89) is an exact lookup: that entry or nothing.
+    id_match = re.fullmatch(r"cwe[\s_-]*([0-9]+)", query.strip(), re.IGNORECASE)
+    if id_match:
+        cwe_id = f"CWE-{int(id_match.group(1))}"
+        return [{"score": 100, "entry": {**entry, "mapping_usage": usage.get(cwe_id)}} for entry in load_cwe_index() if entry["id"] == cwe_id]
     phrase = fold(query)
-    terms = {term for term in re.findall(r"[a-z0-9]+", phrase) if len(term) > 1}
+    # "cwe" appears in every entry's ID, so it carries no signal as a search word.
+    terms = {term for term in re.findall(r"[a-z0-9]+", phrase) if len(term) > 1 and term != "cwe"}
     alternate_terms = cwe_alternate_terms()
     aliased = {cwe_id for alias, ids in SEARCH_ALIASES.items() if contains_phrase(phrase, fold(alias)) for cwe_id in ids}
     scored: list[tuple[int, dict[str, Any]]] = []
@@ -364,8 +370,6 @@ def search_cwe(query: str, limit: int = 10) -> list[dict[str, Any]]:
         nickname = re.search(r"\('([^']+)'\)", str(entry.get("name") or ""))
         if nickname and fold(nickname.group(1)) == phrase:
             score += 5
-        if entry["id"].upper() == normalized_query:
-            score += 100
         if entry["id"] in aliased:
             score += 10
         if score <= 0:
@@ -376,7 +380,6 @@ def search_cwe(query: str, limit: int = 10) -> list[dict[str, Any]]:
     # Ties favor Base weaknesses, the abstraction MITRE prefers for root-cause mapping.
     abstraction_rank = {"Base": 0, "Variant": 1, "Class": 2, "Compound": 3, "Pillar": 4}
     scored.sort(key=lambda item: (-item[0], abstraction_rank.get(item[1].get("abstraction"), 5), item[1]["id"]))
-    usage = cwe_mapping_usage()
     return [
         {"score": score, "entry": {**entry, "mapping_usage": usage.get(entry["id"])}}
         for score, entry in scored[:max(1, min(limit, 50))]

@@ -48,6 +48,11 @@ class AgentSecTests(unittest.TestCase):
             with self.subTest(query=query):
                 self.assertEqual(agentsec.search_cwe(query)[0]["entry"]["id"], cwe_id)
         self.assertEqual(agentsec.search_cwe("zzzzqqq"), [])
+        for spelling in ("CWE-89", "cwe 89", "CWE_89", " cwe-0089 "):
+            with self.subTest(spelling=spelling):
+                self.assertEqual([r["entry"]["id"] for r in agentsec.search_cwe(spelling)], ["CWE-89"])
+        self.assertEqual(agentsec.search_cwe("CWE-999999"), [])
+        self.assertEqual(agentsec.search_cwe("cwe zzzzqqq"), [])
 
     def test_rules_must_cite_existing_allowed_cwes(self):
         problems = agentsec.cwe_mapping_problems(["CWE-79", "CWE-20", "CWE-699", "CWE-999999"])
