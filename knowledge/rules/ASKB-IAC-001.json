@@ -4,12 +4,12 @@
   "status": "stable",
   "summary": "Infrastructure and cloud configuration should grant only the specific identities, actions, resources, networks, and exposure required for the intended service.",
   "applies_to": ["iac", "cloud", "container"],
-  "cwe_ids": ["CWE-284"],
+  "cwe_ids": ["CWE-732", "CWE-250", "CWE-276"],
   "risk": "high",
   "review_checks": ["Find wildcard permissions, public exposure, broad security groups, and default identities.", "Verify each privilege has a documented workload need."],
   "safe_tests": ["Evaluate configuration in a local plan or sandbox account only.", "Use policy tests that assert denied access for unapproved actions."],
   "remediation": ["Replace wildcards with scoped actions and resource constraints.", "Use private-by-default network boundaries and separate workload identities."],
-  "references": [{"source": "CWE", "id": "CWE-284", "url": "https://cwe.mitre.org/data/definitions/284.html"}],
+  "references": [{"source": "CWE", "id": "CWE-732", "url": "https://cwe.mitre.org/data/definitions/732.html"}, {"source": "CWE", "id": "CWE-250", "url": "https://cwe.mitre.org/data/definitions/250.html"}, {"source": "CWE", "id": "CWE-276", "url": "https://cwe.mitre.org/data/definitions/276.html"}],
   "tags": ["iac", "cloud", "access-control"],
   "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
 }

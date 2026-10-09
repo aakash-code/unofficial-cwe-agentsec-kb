@@ -2,6 +2,59 @@
 
 All notable changes are recorded here using the Keep a Changelog style.
 
+## [0.3.0] - 2026-10-09
+
+### Fixed
+
+- `agentsec_get_cwe` returned the raw XML tree (up to ~140 KB), which exceeded
+  Claude Code's MCP output limit, so full CWE lookups failed. It now returns
+  readable text sections (largest entry ~34 KB), omits `Content_History` by
+  default, and accepts a `sections` filter. `cwe-get --raw` keeps the lossless tree.
+- MCP tool results no longer duplicate the payload as `structuredContent`.
+  List results were also invalid there.
+- The server accepts the MCP protocol versions 2025-06-18 and 2025-11-25.
+
+### Added
+
+- `mapping_usage` (MITRE's Allowed / Allowed-with-Review / Discouraged /
+  Prohibited) on CWE search results and entries.
+- CWE search ranks name matches higher and breaks ties toward Base weaknesses.
+- `secure-development-review` skill rewritten to Anthropic's skill format, with
+  review, build-securely, fix, and test-planning modes. Added the references
+  `cwe-mapping.md`, `audit-checklist.md` (including AI/agent surfaces),
+  `report-format.md`, and `security-testing.md`, plus a CLI fallback.
+- The skill now requires a knowledge-base lookup for every CWE it cites and
+  labels any it couldn't check `(unverified)`. Round 1 of the skill evaluation
+  showed it citing well-known IDs from memory.
+- `setup` skill now troubleshoots Python, data-pack, and MCP connection failures.
+- Eight original rules: `ASKB-SSRF-001` (CWE-918), `ASKB-AUTH-002` object-level
+  authorization (CWE-639), `ASKB-AUTH-003` token verification (CWE-347),
+  `ASKB-CSRF-001`, `ASKB-SESSION-001`, `ASKB-REDIRECT-001`, `ASKB-LLM-001`
+  prompt injection (CWE-1427), and `ASKB-LLM-002` agent tool privilege.
+- Scanner detectors for disabled token verification, disabled CSRF protection,
+  weak session-cookie flags, and request-controlled redirects. Unsafe
+  deserialization now also covers `marshal`, `jsonpickle`, and `yaml.unsafe_load`.
+- CWE search matches MITRE alternate terms, so IDOR, XSS, XXE, and
+  "prompt injection" find the right entry. It ranks an entry's quoted common
+  name (`'Race Condition'`) first and ranks deprecated entries last.
+- `validate` rejects rules that cite non-existent, Discouraged, or Prohibited
+  CWEs, and mappings that differ from a rule's `cwe_ids`.
+- GitHub Actions CI on Linux, macOS, and Windows with Python 3.10 and 3.13.
+- A safe-equivalents fixture asserts the scanner reports zero false positives.
+
+### Changed (rules)
+
+- `ASKB-INPUT-001` now maps to CWE-1287, CWE-1284, and CWE-1286 instead of
+  CWE-20, and `ASKB-IAC-001` maps to CWE-732, CWE-250, and CWE-276 instead of
+  CWE-284. MITRE discourages CWE-20 and CWE-284 for root-cause mapping.
+- The scanner's SQL check now catches f-strings, JS template literals, and `%`
+  formatting. It requires SQL structure, so prose containing "select" no
+  longer matches.
+- The reviewer prunes skipped directories such as `node_modules` instead of
+  walking them.
+- The MCP server answers malformed or non-object messages with JSON-RPC errors
+  instead of crashing, and uses UTF-8 stdio on every platform.
+
 ## [0.2.1] - 2026-10-09
 
 ### Changed

@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-REDIRECT-001",
+  "title": "Restrict redirect targets to trusted destinations",
+  "status": "stable",
+  "summary": "Redirects whose destination comes from request data must be limited to known paths or hosts so the application cannot be used to send users to attacker-controlled sites.",
+  "applies_to": ["web-ui", "server-rendered-ui", "web-api"],
+  "cwe_ids": ["CWE-601"],
+  "risk": "medium",
+  "review_checks": ["Find redirect calls that take next, return, url, or similar parameters.", "Check handling of absolute URLs, protocol-relative URLs (//host), and encoded variants."],
+  "safe_tests": ["Pass an external absolute URL and a protocol-relative URL to the redirect parameter on a local instance and confirm the redirect stays on the application."],
+  "remediation": ["Redirect only to relative paths validated against an allowlist, or map short keys to destinations server-side.", "Reject values that parse to a different host or scheme."],
+  "references": [{"source": "CWE", "id": "CWE-601", "url": "https://cwe.mitre.org/data/definitions/601.html"}],
+  "tags": ["redirect", "web"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}

@@ -10,8 +10,8 @@ coding agents. It helps agents perform secure-development reviews, plan
 authorized security tests, normalize findings, and explain remediation using an
 auditable, portable rule set.
 
-It works with Codex, Claude Code, and other coding agents without locking users
-into a model or platform. It includes a pinned, queryable copy of the complete
+It works with Codex, Claude Code, Gemini CLI, and other coding agents without
+locking users into a model or platform. It includes a pinned, queryable copy of the complete
 official **CWE 4.20** XML catalog, preserved under the applicable MITRE terms.
 
 ## What it provides
@@ -23,7 +23,7 @@ official **CWE 4.20** XML catalog, preserved under the applicable MITRE terms.
 - A stable JSON Schema for rules and findings.
 - Version, source, and SHA-256 integrity metadata for the bundled CWE release.
 - A dependency-free local command-line reviewer and MCP-compatible stdio server.
-- Codex, Claude, and generic-agent adapter templates.
+- Codex, Claude Code, Gemini CLI, and generic-agent adapter templates.
 - Fixture-based tests and governance, disclosure, provenance, and safe-testing policies.
 
 ## What it is not
@@ -100,7 +100,9 @@ replace `/absolute/path/to/...` with your clone location:
 Available tools:
 
 - `agentsec_search_rules` and `agentsec_get_rule`
-- `agentsec_search_cwe`, `agentsec_get_cwe`, and `agentsec_cwe_status`
+- `agentsec_search_cwe`, `agentsec_get_cwe`, and `agentsec_cwe_status`. Results
+  include MITRE's `mapping_usage`. `agentsec_get_cwe` returns readable text
+  sections and accepts a `sections` filter.
 - `agentsec_review_path` — authorized local review only
 - `agentsec_validate_kb`
 
@@ -131,6 +133,9 @@ enabled = true
 The plugin starts the local server with `python3 tools/agentsec.py serve`. Test
 it in a new conversation with: “Use secure-development-review to review this
 authorized local project.”
+
+For the distinction between a self-hosted marketplace and the public
+ChatGPT/Codex directory, see [Publish and distribute](#publish-and-distribute).
 
 ### Manual: install only the skill
 
@@ -203,6 +208,34 @@ For persistent project guidance, also copy
 [adapters/claude/CLAUDE.md](adapters/claude/CLAUDE.md) to the target project as
 `CLAUDE.md`. See the [Claude integration notes](adapters/claude/README.md).
 
+## Gemini CLI: install the extension, skill, and MCP server
+
+Gemini CLI loads this repository as a native extension. It bundles the
+`secure-development-review` skill, `GEMINI.md` guidance, and the local MCP
+server; Python 3.10+ must be available as `python3`.
+
+```sh
+gemini extensions install https://github.com/aakash-code/unofficial-cwe-agentsec-kb --ref v0.3.0
+gemini extensions list
+gemini mcp list
+```
+
+Restart Gemini CLI after installing. If it reports a disconnected stdio server,
+review the repository and run `gemini trust` in the project before retrying.
+For local development, use `gemini extensions link /absolute/path/to/unofficial-cwe-agentsec-kb`.
+
+To add only the MCP server to a Gemini project instead of installing the
+extension:
+
+```sh
+gemini mcp add --scope project unofficial_cwe_agentsec_kb \
+  python3 /absolute/path/to/unofficial-cwe-agentsec-kb/tools/agentsec.py serve
+```
+
+The extension manifest is [gemini-extension.json](gemini-extension.json), and
+[GEMINI.md](GEMINI.md) is the context file it loads. See also
+[Publish and distribute](#publish-and-distribute).
+
 ## Other MCP-compatible agents
 
 For Cursor, Cline, Continue, Windsurf, or another MCP-compatible agent, use the
@@ -210,6 +243,14 @@ JSON MCP configuration above and provide
 [adapters/generic/SECURITY_AGENT.md](adapters/generic/SECURITY_AGENT.md) as
 project instructions. Require the structured format in
 [adapters/generic/OUTPUT_CONTRACT.md](adapters/generic/OUTPUT_CONTRACT.md).
+
+## Publish and distribute
+
+The repository contains self-hosted marketplace catalogs for Codex and Claude
+Code, and a root Gemini CLI extension manifest. A marketplace catalog makes a
+plugin installable from this repository; it is not an official directory
+listing. Before you submit to an official directory, note that public submissions need publisher-controlled identity,
+legal URLs, review material, and—where required—a hosted remote MCP server.
 
 ## How agents should use the knowledge base
 

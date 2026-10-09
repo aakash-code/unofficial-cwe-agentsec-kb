@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-SESSION-001",
+  "title": "Set protective attributes on session cookies",
+  "status": "stable",
+  "summary": "Cookies that carry sessions or other credentials must be inaccessible to page scripts, sent only over HTTPS, and limited in cross-site use.",
+  "applies_to": ["web-ui", "server-rendered-ui", "web-api"],
+  "cwe_ids": ["CWE-1004", "CWE-614", "CWE-1275"],
+  "risk": "medium",
+  "review_checks": ["Find where session and auth cookies are set, including framework settings.", "Check the HttpOnly, Secure, and SameSite attributes and the cookie scope (domain and path)."],
+  "safe_tests": ["Inspect Set-Cookie headers from a local or test instance and confirm HttpOnly, Secure, and SameSite are present.", "Confirm document.cookie in the browser does not expose the session cookie."],
+  "remediation": ["Set HttpOnly and Secure on credential cookies and choose SameSite=Lax or Strict.", "Scope cookies to the narrowest domain and path, and rotate the session identifier after login."],
+  "references": [{"source": "CWE", "id": "CWE-1004", "url": "https://cwe.mitre.org/data/definitions/1004.html"}, {"source": "CWE", "id": "CWE-614", "url": "https://cwe.mitre.org/data/definitions/614.html"}, {"source": "CWE", "id": "CWE-1275", "url": "https://cwe.mitre.org/data/definitions/1275.html"}],
+  "tags": ["session", "cookies", "web"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}

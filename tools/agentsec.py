@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from dataclasses import dataclass
@@ -17,6 +18,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 
+VERSION = "0.3.0"
 ROOT = Path(__file__).resolve().parents[1]
 RULES_DIR = ROOT / "knowledge" / "rules"
 CWE_DATA_DIR = ROOT / "data" / "cwe" / "4.20"
@@ -36,8 +38,14 @@ class Detector:
     severity: str
     confidence: str
     impact: str
+    cwe_ids: tuple[str, ...] = ()  # narrower than the rule's CWEs when the pattern pins one weakness
 
 
+# Uppercase SQL is matched as-is; lowercase also needs a WHERE so prose ("select an option from the list") doesn't match.
+SQL = (
+    r"(?:SELECT\b[^\n]*\bFROM\b|INSERT\s+INTO\b|UPDATE\b[^\n]*\bSET\b|DELETE\s+FROM\b"
+    r"|select\b[^\n]*\bfrom\b[^\n]*\bwhere\b|insert\s+into\b|update\b[^\n]*\bset\b[^\n]*\bwhere\b|delete\s+from\b)"
+)
 DETECTORS = (
     Detector(
         "ASKB-INJECT-002",
@@ -49,7 +57,11 @@ DETECTORS = (
     ),
     Detector(
         "ASKB-INJECT-001",
-        re.compile(r"(?:SELECT|INSERT|UPDATE|DELETE)\b[^\n]*(?:\+|\.format\s*\(|f[\"'])", re.IGNORECASE),
+        re.compile(
+            rf"{SQL}[^\n]*(?:[\"']\s*\+|\.format\s*\(|[\"']\s*%\s*[\(\w])"  # concatenation, .format, % formatting
+            rf"|\bf[\"'][^\n]*{SQL}[^\n]*\{{"  # Python f-string
+            rf"|`[^`\n]*{SQL}[^`\n]*\$\{{",  # JS template literal
+        ),
         "Potential dynamic database query",
         "critical",
         "low",
@@ -89,7 +101,7 @@ DETECTORS = (
     ),
     Detector(
         "ASKB-DESER-001",
-        re.compile(r"(?:pickle\.loads?\s*\(|yaml\.load\s*\(|unserialize\s*\()"),
+        re.compile(r"(?:pickle\.loads?\s*\(|cPickle\.loads?\s*\(|marshal\.loads?\s*\(|jsonpickle\.decode\s*\(|yaml\.unsafe_load\s*\(|yaml\.load\s*\((?![^\n]*SafeLoader)|\bunserialize\s*\()"),
         "Potential unsafe object deserialization",
         "critical",
         "medium",
@@ -110,6 +122,40 @@ DETECTORS = (
         "high",
         "low",
         "Broad network exposure may make a service reachable beyond its intended boundary.",
+        ("CWE-732",),
+    ),
+    Detector(
+        "ASKB-AUTH-003",
+        re.compile(r"(?:verify_signature[\"']?\s*:\s*False|algorithms?\s*[=:]\s*\[?[^\]\n]*[\"']none[\"'])", re.IGNORECASE),
+        "Token signature verification disabled or 'none' algorithm accepted",
+        "critical",
+        "high",
+        "Unverified tokens let any caller forge identity claims and impersonate other users.",
+    ),
+    Detector(
+        "ASKB-CSRF-001",
+        re.compile(r"(?:@csrf_exempt\b|WTF_CSRF_ENABLED\s*=\s*False|csrf\s*[:=]\s*false\b|\.disable\(\s*\)\s*;?\s*//\s*csrf|csrf\(\)\.disable\(\))", re.IGNORECASE),
+        "CSRF protection disabled",
+        "high",
+        "medium",
+        "Without CSRF protection, another site can submit state-changing requests using a logged-in user's cookies.",
+        ("CWE-352",),
+    ),
+    Detector(
+        "ASKB-SESSION-001",
+        re.compile(r"(?:SESSION_COOKIE_(?:SECURE|HTTPONLY)\s*=\s*False|httpOnly\s*:\s*false|secure\s*:\s*false\s*[,}]|samesite\s*[=:]\s*[\"']?none\b)", re.IGNORECASE),
+        "Session cookie missing a protective attribute",
+        "medium",
+        "medium",
+        "Cookies without HttpOnly, Secure, or a restrictive SameSite value are easier to steal or misuse cross-site.",
+    ),
+    Detector(
+        "ASKB-REDIRECT-001",
+        re.compile(r"(?:\bredirect\s*\(\s*request\.(?:args|GET|POST|form|values|query_params)\b|\.redirect\s*\(\s*(?:\d+\s*,\s*)?req\.(?:query|body|params)\b)"),
+        "Redirect target taken directly from the request",
+        "medium",
+        "medium",
+        "Redirecting to a user-supplied destination lets attackers use the site to send users to malicious pages.",
     ),
 )
 
@@ -153,6 +199,7 @@ def public_rule(rule: dict[str, Any]) -> dict[str, Any]:
 def validate_rules() -> dict[str, Any]:
     errors: list[dict[str, str]] = []
     seen_ids: set[str] = set()
+    rule_cwes: dict[str, set[str]] = {}
     paths = sorted(RULES_DIR.glob("*.json"))
     for rule_path in paths:
         relative_path = str(rule_path.relative_to(ROOT))
@@ -179,6 +226,9 @@ def validate_rules() -> dict[str, Any]:
             errors.append({"path": relative_path, "error": "invalid risk"})
         if not isinstance(rule.get("cwe_ids"), list) or not all(re.fullmatch(r"CWE-[0-9]+", value or "") for value in rule["cwe_ids"]):
             errors.append({"path": relative_path, "error": "cwe_ids must contain CWE identifiers"})
+        else:
+            rule_cwes[rule_id] = set(rule["cwe_ids"])
+            errors.extend({"path": relative_path, "error": problem} for problem in cwe_mapping_problems(rule["cwe_ids"]))
         provenance = rule.get("provenance")
         if not isinstance(provenance, dict) or provenance.get("origin") not in {"original", "adapted", "imported"}:
             errors.append({"path": relative_path, "error": "invalid provenance.origin"})
@@ -186,15 +236,37 @@ def validate_rules() -> dict[str, Any]:
     mapping_path = ROOT / "mappings" / "cwe.json"
     try:
         mappings = json.loads(mapping_path.read_text(encoding="utf-8"))["mappings"]
-        mapped_rule_ids = {entry["rule_id"] for entry in mappings}
-        for rule_id in seen_ids - mapped_rule_ids:
-            errors.append({"path": "mappings/cwe.json", "error": f"missing mapping for {rule_id}"})
+        mapped: dict[str, set[str]] = {}
+        for entry in mappings:
+            mapped.setdefault(entry["rule_id"], set()).add(entry["cwe_id"])
+        for rule_id in sorted(seen_ids):
+            if rule_id not in mapped:
+                errors.append({"path": "mappings/cwe.json", "error": f"missing mapping for {rule_id}"})
+            elif rule_id in rule_cwes and mapped[rule_id] != rule_cwes[rule_id]:
+                errors.append({"path": "mappings/cwe.json", "error": f"{rule_id} maps {sorted(mapped[rule_id])} but the rule cites {sorted(rule_cwes[rule_id])}"})
+        for rule_id in sorted(set(mapped) - seen_ids):
+            errors.append({"path": "mappings/cwe.json", "error": f"mapping for unknown rule {rule_id}"})
     except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
         errors.append({"path": "mappings/cwe.json", "error": f"invalid mapping file: {exc}"})
     cwe_data = validate_cwe_data()
     if not cwe_data["valid"]:
         errors.extend({"path": entry["path"], "error": entry["error"]} for entry in cwe_data["errors"])
     return {"valid": not errors, "rule_count": len(paths), "cwe_data": cwe_data, "errors": errors}
+
+
+def cwe_mapping_problems(cwe_ids: Iterable[str]) -> list[str]:
+    """Rules must cite real weaknesses that MITRE permits for root-cause mapping."""
+    try:
+        usage = cwe_mapping_usage()
+    except (OSError, json.JSONDecodeError, KeyError, TypeError):
+        return []  # validate_cwe_data reports the broken data pack
+    problems = []
+    for cwe_id in cwe_ids:
+        if cwe_id not in usage:
+            problems.append(f"{cwe_id} is not in the CWE {CWE_DATA_DIR.name} catalog")
+        elif usage[cwe_id] in {"Discouraged", "Prohibited"}:
+            problems.append(f"{cwe_id} has mapping usage {usage[cwe_id]}; cite a more specific allowed weakness")
+    return problems
 
 
 def validate_cwe_data() -> dict[str, Any]:
@@ -249,20 +321,105 @@ def get_rule(rule_id: str) -> dict[str, Any] | None:
 
 def search_cwe(query: str, limit: int = 10) -> list[dict[str, Any]]:
     normalized_query = query.strip().upper()
+    phrase = query.strip().lower()
     terms = {term.lower() for term in re.findall(r"[a-zA-Z0-9_-]+", query) if len(term) > 1}
+    alternate_terms = cwe_alternate_terms()
     scored: list[tuple[int, dict[str, Any]]] = []
     for entry in load_cwe_index():
-        corpus = " ".join(str(entry.get(key) or "") for key in ("id", "type", "name", "status", "summary", "abstraction", "structure")).lower()
-        score = sum(1 for term in terms if term in corpus)
+        # MITRE's alternate terms carry the shorthand people search with: XSS, IDOR, XXE, prompt injection.
+        title = " | ".join([str(entry.get("name") or ""), *alternate_terms.get(entry["id"], [])]).lower()
+        corpus = " ".join([title, *(str(entry.get(key) or "") for key in ("id", "type", "status", "summary", "abstraction", "structure"))]).lower()
+        # Title hits count double so the canonical entry outranks entries that only mention the term.
+        score = sum((2 if term in title else 1) for term in terms if term in corpus)
+        if len(phrase) > 2 and re.search(rf"(?<![a-z0-9]){re.escape(phrase)}(?![a-z0-9])", title):
+            score += 5
+        # MITRE puts an entry's common name in quotes, e.g. "...Synchronization ('Race Condition')".
+        nickname = re.search(r"\('([^']+)'\)", str(entry.get("name") or ""))
+        if nickname and nickname.group(1).lower() == phrase:
+            score += 5
+        if entry.get("status") in {"Deprecated", "Obsolete"}:
+            score -= 5
         if entry["id"].upper() == normalized_query:
             score += 100
         if score:
             scored.append((score, entry))
-    scored.sort(key=lambda item: (-item[0], item[1]["id"]))
-    return [{"score": score, "entry": entry} for score, entry in scored[:max(1, min(limit, 50))]]
+    # Ties favor Base weaknesses, the abstraction MITRE prefers for root-cause mapping.
+    abstraction_rank = {"Base": 0, "Variant": 1, "Class": 2, "Compound": 3, "Pillar": 4}
+    scored.sort(key=lambda item: (-item[0], abstraction_rank.get(item[1].get("abstraction"), 5), item[1]["id"]))
+    usage = cwe_mapping_usage()
+    return [
+        {"score": score, "entry": {**entry, "mapping_usage": usage.get(entry["id"])}}
+        for score, entry in scored[:max(1, min(limit, 50))]
+    ]
+
+
+def find_child(node: dict[str, Any], tag: str) -> dict[str, Any] | None:
+    return next((child for child in node.get("children") or [] if child.get("tag") == tag), None)
+
+
+@lru_cache(maxsize=1)
+def cwe_mapping_usage() -> dict[str, str | None]:
+    """Map each CWE ID to MITRE's vulnerability-mapping usage (Allowed, Discouraged, Prohibited, ...)."""
+    usage: dict[str, str | None] = {}
+    catalog = load_cwe_catalog()
+    for collection in ("weaknesses", "categories", "views"):
+        for entry in catalog.get(collection, []):
+            notes = find_child(entry["content"], "Mapping_Notes")
+            value = find_child(notes, "Usage") if notes else None
+            usage[entry["id"]] = value.get("text") if value else None
+    return usage
+
+
+@lru_cache(maxsize=1)
+def cwe_alternate_terms() -> dict[str, list[str]]:
+    terms: dict[str, list[str]] = {}
+    for entry in load_cwe_catalog().get("weaknesses", []):
+        block = find_child(entry["content"], "Alternate_Terms")
+        for alternate in (block or {}).get("children") or []:
+            term = find_child(alternate, "Term")
+            if term and term.get("text"):
+                terms.setdefault(entry["id"], []).append(term["text"])
+    return terms
+
+
+def render_node(node: dict[str, Any], lines: list[str]) -> None:
+    attributes = " ".join(f"{key}={value}" for key, value in (node.get("attributes") or {}).items())
+    text = (node.get("text") or "").strip()
+    line = " ".join(part for part in (attributes, text) if part)
+    if line:
+        lines.append(line)
+    for child in node.get("children") or []:
+        render_node(child, lines)
+
+
+def readable_cwe(entry: dict[str, Any], sections: list[str] | None = None) -> dict[str, Any]:
+    """Render an entry's XML tree as plain-text sections so one entry fits an agent tool result."""
+    wanted = {section.lower() for section in sections or []}
+    rendered: dict[str, str] = {}
+    for child in entry["content"].get("children") or []:
+        tag = child["tag"]
+        if wanted and "all" not in wanted and tag.lower() not in wanted:
+            continue
+        if not wanted and tag in DEFAULT_OMITTED_SECTIONS:
+            continue
+        lines: list[str] = []
+        render_node({**child, "tag": tag}, lines)
+        rendered[tag] = "\n".join(lines)
+    available = [child["tag"] for child in entry["content"].get("children") or []]
+    return {
+        **{key: entry.get(key) for key in ("id", "type", "name", "status", "abstraction", "structure", "summary")},
+        "mapping_usage": cwe_mapping_usage().get(entry["id"]),
+        "url": f"https://cwe.mitre.org/data/definitions/{entry['id'].split('-')[1]}.html",
+        "sections": rendered,
+        "available_sections": available,
+    }
+
+
+DEFAULT_OMITTED_SECTIONS = {"Content_History"}
 
 
 def get_cwe(cwe_id: str) -> dict[str, Any] | None:
+    """Return the raw lossless catalog entry (XML tree as JSON)."""
     normalized = cwe_id.upper().strip()
     if not re.fullmatch(r"CWE-[0-9]+", normalized):
         raise ValueError("CWE ID must match CWE-<number>")
@@ -287,12 +444,18 @@ def cwe_status() -> dict[str, Any]:
 
 
 def iter_text_files(target: Path) -> Iterable[Path]:
-    for path in target.rglob("*"):
-        if path.is_symlink() or not path.is_file():
-            continue
-        if any(part in SKIP_DIRS for part in path.parts):
-            continue
-        if path.suffix.lower() in TEXT_SUFFIXES and path.stat().st_size <= 1_000_000:
+    # os.walk lets us prune skipped directories instead of descending into node_modules and friends.
+    for directory, subdirectories, files in os.walk(target, followlinks=False):
+        subdirectories[:] = sorted(name for name in subdirectories if name not in SKIP_DIRS)
+        for name in sorted(files):
+            path = Path(directory, name)
+            if path.suffix.lower() not in TEXT_SUFFIXES:
+                continue
+            try:
+                if path.is_symlink() or not path.is_file() or path.stat().st_size > 1_000_000:
+                    continue
+            except OSError:
+                continue
             yield path
 
 
@@ -335,7 +498,7 @@ def review_path(path_value: str, max_files: int = 5_000) -> dict[str, Any]:
                     "title": detector.title,
                     "severity": detector.severity,
                     "confidence": detector.confidence,
-                    "cwe_ids": rule["cwe_ids"],
+                    "cwe_ids": list(detector.cwe_ids or rule["cwe_ids"]),
                     "evidence": {"path": relative_path, "line": line_number, "snippet": line.strip()[:500]},
                     "impact": detector.impact,
                     "safe_verification": rule["safe_tests"],
@@ -390,8 +553,8 @@ def tool_definitions() -> list[dict[str, Any]]:
         },
         {
             "name": "agentsec_get_cwe",
-            "description": "Retrieve the complete canonical content for one CWE weakness, category, or view from the pinned official CWE data pack.",
-            "inputSchema": {"type": "object", "properties": {"cwe_id": {"type": "string", "pattern": "^CWE-[0-9]+$"}}, "required": ["cwe_id"]},
+            "description": "Retrieve one CWE weakness, category, or view from the pinned official CWE data pack as readable text sections, with MITRE's mapping_usage (Allowed, Allowed-with-Review, Discouraged, Prohibited). Content_History is omitted unless requested. Pass sections (e.g. [\"Potential_Mitigations\", \"Mapping_Notes\"] or [\"all\"]) to narrow or widen the result.",
+            "inputSchema": {"type": "object", "properties": {"cwe_id": {"type": "string", "pattern": "^CWE-[0-9]+$"}, "sections": {"type": "array", "items": {"type": "string"}}}, "required": ["cwe_id"]},
         },
         {
             "name": "agentsec_cwe_status",
@@ -419,14 +582,16 @@ def handle_tool_call(name: str, arguments: dict[str, Any]) -> Any:
         entry = get_cwe(str(arguments["cwe_id"]))
         if entry is None:
             raise ValueError("CWE entry not found")
-        return entry
+        sections = arguments.get("sections")
+        return readable_cwe(entry, [str(section) for section in sections] if isinstance(sections, list) else None)
     if name == "agentsec_cwe_status":
         return cwe_status()
     raise ValueError(f"unknown tool: {name}")
 
 
-def mcp_response(message_id: Any, result: Any = None, error: dict[str, Any] | None = None) -> None:
-    if message_id is None:
+def mcp_response(message_id: Any, result: Any = None, error: dict[str, Any] | None = None, reply_without_id: bool = False) -> None:
+    # Notifications (no id) never get a reply; parse and invalid-request errors reply with id null.
+    if message_id is None and not reply_without_id:
         return
     response: dict[str, Any] = {"jsonrpc": "2.0", "id": message_id}
     if error is not None:
@@ -437,31 +602,48 @@ def mcp_response(message_id: Any, result: Any = None, error: dict[str, Any] | No
     sys.stdout.flush()
 
 
+SUPPORTED_PROTOCOL_VERSIONS = ("2024-11-05", "2025-03-26", "2025-06-18", "2025-11-25")
+
+
 def serve() -> int:
     """Run a minimal newline-delimited JSON-RPC MCP server on standard I/O."""
+    # MCP stdio is UTF-8; Windows consoles otherwise default to a legacy code page.
+    for stream in (sys.stdin, sys.stdout):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
     for raw_line in sys.stdin:
         request: dict[str, Any] = {}
         try:
-            request = json.loads(raw_line)
+            if not raw_line.strip():
+                continue
+            parsed = json.loads(raw_line)
+            if not isinstance(parsed, dict):
+                mcp_response(None, error={"code": -32600, "message": "invalid request"}, reply_without_id=True)
+                continue
+            request = parsed
             method = request.get("method")
             message_id = request.get("id")
-            params = request.get("params", {})
+            params = request.get("params") or {}
+            if not isinstance(params, dict):
+                mcp_response(message_id, error={"code": -32602, "message": "params must be an object"})
+                continue
             if method == "initialize":
                 requested = params.get("protocolVersion")
-                version = requested if requested in {"2024-11-05", "2025-03-26"} else "2025-03-26"
+                version = requested if requested in SUPPORTED_PROTOCOL_VERSIONS else SUPPORTED_PROTOCOL_VERSIONS[-1]
                 mcp_response(message_id, {
                     "protocolVersion": version,
                     "capabilities": {"tools": {"listChanged": False}},
-                    "serverInfo": {"name": "agentsec-kb", "version": "0.2.1"},
+                    "serverInfo": {"name": "agentsec-kb", "version": VERSION},
                 })
             elif method == "tools/list":
                 mcp_response(message_id, {"tools": tool_definitions()})
             elif method == "tools/call":
                 try:
                     result = handle_tool_call(params["name"], params.get("arguments", {}))
+                    # Compact text only: duplicating it as structuredContent doubles the size hosts count
+                    # against their tool-output limit, and the largest CWE entries already run ~35k chars.
                     mcp_response(message_id, {
-                        "content": [{"type": "text", "text": json.dumps(result, indent=2, sort_keys=True)}],
-                        "structuredContent": result,
+                        "content": [{"type": "text", "text": json.dumps(result, separators=(",", ":"))}],
                     })
                 except (KeyError, TypeError, ValueError) as exc:
                     mcp_response(message_id, {"content": [{"type": "text", "text": str(exc)}], "isError": True})
@@ -470,7 +652,7 @@ def serve() -> int:
             elif method and message_id is not None:
                 mcp_response(message_id, error={"code": -32601, "message": f"method not found: {method}"})
         except json.JSONDecodeError as exc:
-            mcp_response(None, error={"code": -32700, "message": f"parse error: {exc.msg}"})
+            mcp_response(None, error={"code": -32700, "message": f"parse error: {exc.msg}"}, reply_without_id=True)
         except Exception as exc:  # Defensive boundary for a local stdio server.
             mcp_response(request.get("id"), error={"code": -32603, "message": str(exc)})
     return 0
@@ -488,6 +670,8 @@ def main() -> int:
     cwe_search_parser.add_argument("--limit", type=int, default=10)
     cwe_get_parser = subparsers.add_parser("cwe-get", help="retrieve complete canonical CWE content")
     cwe_get_parser.add_argument("cwe_id")
+    cwe_get_parser.add_argument("--section", action="append", dest="sections", help="section tag to include (repeatable; 'all' for every section)")
+    cwe_get_parser.add_argument("--raw", action="store_true", help="print the lossless XML-derived tree instead of readable sections")
     subparsers.add_parser("cwe-status", help="show data-pack version and integrity metadata")
     get_parser = subparsers.add_parser("get", help="retrieve a rule")
     get_parser.add_argument("rule_id")
@@ -513,7 +697,7 @@ def main() -> int:
             if result is None:
                 print(f"CWE entry not found: {args.cwe_id}", file=sys.stderr)
                 return 1
-            sys.stdout.write(json_output(result))
+            sys.stdout.write(json_output(result if args.raw else readable_cwe(result, args.sections)))
             return 0
         if args.command == "cwe-status":
             sys.stdout.write(json_output(cwe_status()))

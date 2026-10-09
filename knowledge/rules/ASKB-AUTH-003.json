@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-AUTH-003",
+  "title": "Verify token signatures, algorithms, and claims",
+  "status": "stable",
+  "summary": "Bearer tokens such as JWTs must be cryptographically verified with a pinned algorithm and expected key, and their issuer, audience, and expiry must be checked before any claim is trusted.",
+  "applies_to": ["web-api", "service", "gateway"],
+  "cwe_ids": ["CWE-347"],
+  "risk": "critical",
+  "review_checks": ["Find token decode calls and confirm signature verification is enabled and cannot be switched off by configuration or headers.", "Confirm the accepted algorithm list is pinned and excludes 'none'; confirm the key comes from a trusted source, not the token itself.", "Confirm exp, nbf, iss, and aud are validated."],
+  "safe_tests": ["Send a locally crafted token signed with a different key and confirm it is rejected.", "Send an unsigned token with alg set to none and an expired token, and confirm both are rejected with 401."],
+  "remediation": ["Use the library's verifying decode with an explicit algorithms list and the issuer's published key.", "Require exp and validate iss and aud; reject tokens on any verification error with a uniform 401.", "Do not use unverified claims for authorization, even temporarily."],
+  "references": [{"source": "CWE", "id": "CWE-347", "url": "https://cwe.mitre.org/data/definitions/347.html"}],
+  "tags": ["authentication", "jwt", "tokens"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}

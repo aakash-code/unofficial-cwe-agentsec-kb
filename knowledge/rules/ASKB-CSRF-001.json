@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-CSRF-001",
+  "title": "Protect state-changing requests from cross-site forgery",
+  "status": "stable",
+  "summary": "When a browser sends credentials automatically, as with session cookies, state-changing requests must prove they originated from the application rather than from another site.",
+  "applies_to": ["web-ui", "server-rendered-ui", "web-api"],
+  "cwe_ids": ["CWE-352", "CWE-1275"],
+  "risk": "high",
+  "review_checks": ["Identify cookie-authenticated endpoints that change state, including GET handlers that should not.", "Check for framework CSRF protection being disabled or exempted.", "Check the SameSite attribute and Origin or Referer validation on sensitive actions."],
+  "safe_tests": ["From a local page on a different origin, submit a state-changing request with the test user's cookie and confirm it is refused.", "Confirm requests without a valid token are rejected."],
+  "remediation": ["Keep the framework's CSRF middleware enabled and use per-session or per-request tokens on state-changing forms and APIs.", "Set session cookies to SameSite=Lax or Strict and validate Origin on sensitive actions.", "Never change state on GET."],
+  "references": [{"source": "CWE", "id": "CWE-352", "url": "https://cwe.mitre.org/data/definitions/352.html"}, {"source": "CWE", "id": "CWE-1275", "url": "https://cwe.mitre.org/data/definitions/1275.html"}],
+  "tags": ["csrf", "web", "cookies"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}

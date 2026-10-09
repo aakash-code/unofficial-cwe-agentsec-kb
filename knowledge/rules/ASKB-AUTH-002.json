@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-AUTH-002",
+  "title": "Check ownership for every object accessed by identifier",
+  "status": "stable",
+  "summary": "Endpoints that load, change, or delete a record by an identifier from the request must confirm that the caller is permitted to access that specific record, not only that the caller is logged in.",
+  "applies_to": ["web-api", "service", "mobile-backend"],
+  "cwe_ids": ["CWE-639"],
+  "risk": "high",
+  "review_checks": ["List handlers that take an object ID from the path, query, body, or token claims.", "Confirm the data-access query is scoped by the caller's tenant, owner, or role, on every HTTP verb.", "Check bulk, export, and search endpoints, which often skip per-object checks."],
+  "safe_tests": ["Create two local test users with separate records and confirm each receives 403 or 404 for the other's IDs on read, update, and delete.", "Confirm sequential or guessable IDs do not reveal whether another user's record exists."],
+  "remediation": ["Scope queries by the authenticated principal (for example WHERE id = ? AND owner_id = ?) instead of checking after loading.", "Centralize object-level authorization in one policy layer and cover it with cross-user regression tests.", "Treat unguessable IDs as defense in depth, not as the authorization control."],
+  "references": [{"source": "CWE", "id": "CWE-639", "url": "https://cwe.mitre.org/data/definitions/639.html"}],
+  "tags": ["authorization", "idor", "access-control"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}

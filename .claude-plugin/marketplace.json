@@ -6,11 +6,11 @@
     "name": "Aakash",
     "url": "https://github.com/aakash-code"
   },
-  "version": "0.2.1",
+  "version": "0.3.0",
   "plugins": [
     {
       "name": "unofficial-cwe-agentsec-kb",
-      "version": "0.2.1",
+      "version": "0.3.0",
       "description": "CWE-based security knowledge, review skills, and a local read-only MCP server.",
       "source": "./",
       "category": "security",

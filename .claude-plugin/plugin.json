@@ -1,7 +1,7 @@
 {
   "name": "unofficial-cwe-agentsec-kb",
   "displayName": "Unofficial CWE AgentSec KB",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Independent CWE-based security knowledge and authorized local review workflows for coding agents.",
   "author": {
     "name": "Aakash",

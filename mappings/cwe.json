@@ -7,7 +7,9 @@
     "terms": "https://cwe.mitre.org/about/termsofuse.html"
   },
   "mappings": [
-    {"rule_id": "ASKB-INPUT-001", "cwe_id": "CWE-20", "url": "https://cwe.mitre.org/data/definitions/20.html"},
+    {"rule_id": "ASKB-INPUT-001", "cwe_id": "CWE-1287", "url": "https://cwe.mitre.org/data/definitions/1287.html"},
+    {"rule_id": "ASKB-INPUT-001", "cwe_id": "CWE-1284", "url": "https://cwe.mitre.org/data/definitions/1284.html"},
+    {"rule_id": "ASKB-INPUT-001", "cwe_id": "CWE-1286", "url": "https://cwe.mitre.org/data/definitions/1286.html"},
     {"rule_id": "ASKB-INJECT-001", "cwe_id": "CWE-89", "url": "https://cwe.mitre.org/data/definitions/89.html"},
     {"rule_id": "ASKB-INJECT-002", "cwe_id": "CWE-78", "url": "https://cwe.mitre.org/data/definitions/78.html"},
     {"rule_id": "ASKB-AUTH-001", "cwe_id": "CWE-862", "url": "https://cwe.mitre.org/data/definitions/862.html"},
@@ -17,7 +19,21 @@
     {"rule_id": "ASKB-PATH-001", "cwe_id": "CWE-22", "url": "https://cwe.mitre.org/data/definitions/22.html"},
     {"rule_id": "ASKB-DESER-001", "cwe_id": "CWE-502", "url": "https://cwe.mitre.org/data/definitions/502.html"},
     {"rule_id": "ASKB-DEPS-001", "cwe_id": "CWE-1104", "url": "https://cwe.mitre.org/data/definitions/1104.html"},
-    {"rule_id": "ASKB-IAC-001", "cwe_id": "CWE-284", "url": "https://cwe.mitre.org/data/definitions/284.html"},
-    {"rule_id": "ASKB-LOG-001", "cwe_id": "CWE-532", "url": "https://cwe.mitre.org/data/definitions/532.html"}
+    {"rule_id": "ASKB-IAC-001", "cwe_id": "CWE-732", "url": "https://cwe.mitre.org/data/definitions/732.html"},
+    {"rule_id": "ASKB-IAC-001", "cwe_id": "CWE-250", "url": "https://cwe.mitre.org/data/definitions/250.html"},
+    {"rule_id": "ASKB-IAC-001", "cwe_id": "CWE-276", "url": "https://cwe.mitre.org/data/definitions/276.html"},
+    {"rule_id": "ASKB-LOG-001", "cwe_id": "CWE-532", "url": "https://cwe.mitre.org/data/definitions/532.html"},
+    {"rule_id": "ASKB-AUTH-002", "cwe_id": "CWE-639", "url": "https://cwe.mitre.org/data/definitions/639.html"},
+    {"rule_id": "ASKB-AUTH-003", "cwe_id": "CWE-347", "url": "https://cwe.mitre.org/data/definitions/347.html"},
+    {"rule_id": "ASKB-CSRF-001", "cwe_id": "CWE-352", "url": "https://cwe.mitre.org/data/definitions/352.html"},
+    {"rule_id": "ASKB-CSRF-001", "cwe_id": "CWE-1275", "url": "https://cwe.mitre.org/data/definitions/1275.html"},
+    {"rule_id": "ASKB-LLM-001", "cwe_id": "CWE-1427", "url": "https://cwe.mitre.org/data/definitions/1427.html"},
+    {"rule_id": "ASKB-LLM-002", "cwe_id": "CWE-250", "url": "https://cwe.mitre.org/data/definitions/250.html"},
+    {"rule_id": "ASKB-LLM-002", "cwe_id": "CWE-862", "url": "https://cwe.mitre.org/data/definitions/862.html"},
+    {"rule_id": "ASKB-REDIRECT-001", "cwe_id": "CWE-601", "url": "https://cwe.mitre.org/data/definitions/601.html"},
+    {"rule_id": "ASKB-SESSION-001", "cwe_id": "CWE-1004", "url": "https://cwe.mitre.org/data/definitions/1004.html"},
+    {"rule_id": "ASKB-SESSION-001", "cwe_id": "CWE-614", "url": "https://cwe.mitre.org/data/definitions/614.html"},
+    {"rule_id": "ASKB-SESSION-001", "cwe_id": "CWE-1275", "url": "https://cwe.mitre.org/data/definitions/1275.html"},
+    {"rule_id": "ASKB-SSRF-001", "cwe_id": "CWE-918", "url": "https://cwe.mitre.org/data/definitions/918.html"}
   ]
 }

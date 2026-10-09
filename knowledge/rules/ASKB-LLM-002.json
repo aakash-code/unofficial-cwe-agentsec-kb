@@ -1,0 +1,15 @@
+{
+  "id": "ASKB-LLM-002",
+  "title": "Give AI agents least-privilege tools with authorization in code",
+  "status": "stable",
+  "summary": "Tools exposed to an LLM agent must be narrow, typed, and authorized per call against the end user's permissions, because the model's choice of tool and arguments can be steered by untrusted input.",
+  "applies_to": ["ai-agent", "llm-application", "mcp-server"],
+  "cwe_ids": ["CWE-250", "CWE-862"],
+  "risk": "critical",
+  "review_checks": ["List every tool or MCP capability the agent can call and the credentials each runs with.", "Flag general-purpose tools (shell, eval, raw SQL, arbitrary HTTP, file system) and tools whose identity or scope comes from model arguments.", "Check that each tool call is authorized against the authenticated end user, not the agent's service account."],
+  "safe_tests": ["With stubbed tools in a local build, ask the agent to act on another user's data and confirm the tool layer refuses regardless of model output.", "Unit-test each tool handler directly with out-of-scope arguments."],
+  "remediation": ["Replace general-purpose tools with narrow operations (for example get_order_status(order_id)) that validate arguments and run with minimal credentials.", "Bind identity server-side: inject the authenticated user into tool handlers instead of accepting it as a model argument.", "Cap iterations, tool output size, and spend; log tool calls without sensitive payloads; require approval for destructive actions."],
+  "references": [{"source": "CWE", "id": "CWE-250", "url": "https://cwe.mitre.org/data/definitions/250.html"}, {"source": "CWE", "id": "CWE-862", "url": "https://cwe.mitre.org/data/definitions/862.html"}],
+  "tags": ["llm", "ai-agent", "least-privilege", "authorization"],
+  "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}
+}
