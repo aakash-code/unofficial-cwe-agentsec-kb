@@ -336,24 +336,33 @@ SEARCH_ALIASES = {
 }
 
 
+def fold(text: str) -> str:
+    """Lowercase and treat hyphens, underscores, and spaces alike: zip-slip == zip slip, cross-site == cross site."""
+    return re.sub(r"[\s_-]+", " ", text.lower()).strip()
+
+
+def contains_phrase(haystack: str, phrase: str) -> bool:
+    return re.search(rf"(?<![a-z0-9]){re.escape(phrase)}(?![a-z0-9])", haystack) is not None
+
+
 def search_cwe(query: str, limit: int = 10) -> list[dict[str, Any]]:
     normalized_query = query.strip().upper()
-    phrase = query.strip().lower()
-    terms = {term.lower() for term in re.findall(r"[a-zA-Z0-9_-]+", query) if len(term) > 1}
+    phrase = fold(query)
+    terms = {term for term in re.findall(r"[a-z0-9]+", phrase) if len(term) > 1}
     alternate_terms = cwe_alternate_terms()
-    aliased = {cwe_id for alias, ids in SEARCH_ALIASES.items() if re.search(rf"(?<![a-z0-9]){alias}(?![a-z0-9])", phrase) for cwe_id in ids}
+    aliased = {cwe_id for alias, ids in SEARCH_ALIASES.items() if contains_phrase(phrase, fold(alias)) for cwe_id in ids}
     scored: list[tuple[int, dict[str, Any]]] = []
     for entry in load_cwe_index():
         # MITRE's alternate terms carry the shorthand people search with: XSS, IDOR, XXE, prompt injection.
-        title = " | ".join([str(entry.get("name") or ""), *alternate_terms.get(entry["id"], [])]).lower()
-        corpus = " ".join([title, *(str(entry.get(key) or "") for key in ("id", "type", "status", "summary", "abstraction", "structure"))]).lower()
+        title = fold(" | ".join([str(entry.get("name") or ""), *alternate_terms.get(entry["id"], [])]))
+        corpus = fold(" ".join([title, *(str(entry.get(key) or "") for key in ("id", "type", "status", "summary", "abstraction", "structure"))]))
         # Title hits count double so the canonical entry outranks entries that only mention the term.
         score = sum((2 if term in title else 1) for term in terms if term in corpus)
-        if len(phrase) > 2 and re.search(rf"(?<![a-z0-9]){re.escape(phrase)}(?![a-z0-9])", title):
+        if len(phrase) > 2 and contains_phrase(title, phrase):
             score += 5
         # MITRE puts an entry's common name in quotes, e.g. "...Synchronization ('Race Condition')".
         nickname = re.search(r"\('([^']+)'\)", str(entry.get("name") or ""))
-        if nickname and nickname.group(1).lower() == phrase:
+        if nickname and fold(nickname.group(1)) == phrase:
             score += 5
         if entry["id"].upper() == normalized_query:
             score += 100

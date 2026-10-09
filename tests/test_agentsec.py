@@ -41,6 +41,8 @@ class AgentSecTests(unittest.TestCase):
             "os command injection": "CWE-78", "open redirect": "CWE-601", "path traversal": "CWE-22",
             "JWT": "CWE-347", "CORS": "CWE-942", "timing attack": "CWE-208", "log injection": "CWE-117",
             "insecure randomness": "CWE-338", "zip slip": "CWE-22", "jwt signature not verified": "CWE-347",
+            "zip-slip": "CWE-22", "prompt-injection": "CWE-1427", "cross site scripting": "CWE-79",
+            "Race_Condition": "CWE-362", "CWE-89": "CWE-89", "cwe-918": "CWE-918",
         }
         for query, cwe_id in expected.items():
             with self.subTest(query=query):

@@ -13,6 +13,10 @@ All notable changes are recorded here using the Keep a Changelog style.
 - MCP tool results no longer duplicate the payload as `structuredContent`.
   List results were also invalid there.
 - The server accepts the MCP protocol versions 2025-06-18 and 2025-11-25.
+- Search no longer returns unrelated deprecated entries for queries with no
+  match. `validate` reports duplicate mapping rows. The MCP server rejects
+  falsy non-object `params`.
+- Search treats hyphens, underscores, and spaces alike (`zip-slip`, `prompt-injection`).
 
 ### Added
 
@@ -58,9 +62,6 @@ All notable changes are recorded here using the Keep a Changelog style.
     test XSS per output context, and test CSRF against exact origins.
   - The skill references ask before running scanners that contact external
     services.
-- Search no longer returns unrelated deprecated entries for queries with no
-  match. `validate` reports duplicate mapping rows. The MCP server rejects
-  falsy non-object `params`.
 
 - `ASKB-INPUT-001` now maps to CWE-1287, CWE-1284, and CWE-1286 instead of
   CWE-20, and `ASKB-IAC-001` maps to CWE-732, CWE-250, and CWE-276 instead of
