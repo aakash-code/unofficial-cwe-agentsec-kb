@@ -2,12 +2,35 @@
   "name": "unofficial-cwe-agentsec-kb",
   "version": "0.2.1",
   "description": "Independent CWE-based security knowledge and authorized local review workflows for coding agents.",
+  "author": {
+    "name": "aakash-code",
+    "url": "https://github.com/aakash-code"
+  },
+  "homepage": "https://github.com/aakash-code/unofficial-cwe-agentsec-kb",
+  "repository": "https://github.com/aakash-code/unofficial-cwe-agentsec-kb",
+  "license": "MIT",
+  "keywords": ["security", "cwe", "mcp", "secure-development"],
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "onboardingSkill": "./skills/setup/SKILL.md",
   "interface": {
     "displayName": "Unofficial CWE AgentSec KB",
-    "shortDescription": "Independent CWE-based security knowledge for coding agents.",
-    "defaultPrompt": "Use secure-development-review to review this authorized local project."
+    "shortDescription": "Secure review guidance for agents",
+    "longDescription": "Search original secure-development guidance and a pinned CWE 4.20 catalog, then review authorized local code. Findings are evidence-based leads for human review; the bundled server does not execute reviewed code, contact networks, or access credentials.",
+    "developerName": "aakash-code",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Search secure-development rules",
+      "Retrieve CWE entries",
+      "Review authorized local code"
+    ],
+    "defaultPrompt": [
+      "Use secure-development-review to review this authorized local project.",
+      "Find CWE guidance for server-side request forgery.",
+      "Check whether the local AgentSec KB data pack is valid."
+    ],
+    "brandColor": "#005F73",
+    "composerIcon": "./assets/agentsec-shield.svg",
+    "logo": "./assets/agentsec-shield.svg"
   }
 }

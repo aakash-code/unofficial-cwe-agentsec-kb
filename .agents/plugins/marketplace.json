@@ -1,5 +1,8 @@
 {
   "name": "unofficial-cwe-agentsec",
+  "interface": {
+    "displayName": "Unofficial CWE AgentSec"
+  },
   "plugins": [
     {
       "name": "unofficial-cwe-agentsec-kb",
@@ -12,6 +15,7 @@
         "installation": "AVAILABLE",
         "authentication": "NONE"
       },
+      "category": "Developer Tools",
       "interface": {
         "displayName": "Unofficial CWE AgentSec KB",
         "shortDescription": "Independent CWE-based security knowledge for coding agents."

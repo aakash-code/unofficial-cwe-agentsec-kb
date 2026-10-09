@@ -1,0 +1,13 @@
+{
+  "name": "unofficial-cwe-agentsec-kb",
+  "version": "0.2.1",
+  "description": "Independent CWE-based security knowledge and authorized local review workflows for coding agents.",
+  "contextFileName": "GEMINI.md",
+  "mcpServers": {
+    "unofficial_cwe_agentsec_kb": {
+      "command": "python3",
+      "args": ["${extensionPath}/tools/agentsec.py", "serve"],
+      "cwd": "${extensionPath}"
+    }
+  }
+}

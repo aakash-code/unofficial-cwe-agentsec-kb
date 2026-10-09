@@ -4,24 +4,17 @@
   "version": "0.2.1",
   "description": "Independent CWE-based security knowledge and authorized local review workflows for coding agents.",
   "author": {
-    "name": "Aakash"
+    "name": "Aakash",
+    "url": "https://github.com/aakash-code"
   },
   "homepage": "https://github.com/aakash-code/unofficial-cwe-agentsec-kb",
   "repository": "https://github.com/aakash-code/unofficial-cwe-agentsec-kb",
   "license": "MIT",
-  "keywords": [
-    "security",
-    "cwe",
-    "secure-development",
-    "mcp"
-  ],
+  "keywords": ["security", "cwe", "secure-development", "mcp"],
   "mcpServers": {
     "unofficial_cwe_agentsec_kb": {
       "command": "python3",
-      "args": [
-        "${CLAUDE_PLUGIN_ROOT}/tools/agentsec.py",
-        "serve"
-      ]
+      "args": ["${CLAUDE_PLUGIN_ROOT}/tools/agentsec.py", "serve"]
     }
   }
 }
