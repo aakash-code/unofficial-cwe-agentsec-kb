@@ -7,8 +7,8 @@
   "cwe_ids": ["CWE-918"],
   "risk": "high",
   "review_checks": ["Find HTTP clients whose URL, host, or redirect target comes from request data, stored records, webhooks, or model output.", "Check whether the destination is validated after DNS resolution and after every redirect.", "Check whether response bodies or timing are returned to the caller."],
-  "safe_tests": ["Point the feature at a local listener on 127.0.0.1 and confirm the request is refused.", "Use a hostname that resolves to a private or link-local address and confirm it is refused, including through a redirect."],
-  "remediation": ["Prefer identifiers over URLs: accept a document or integration ID and build the URL server-side.", "Otherwise enforce an allowlist of schemes and hosts, resolve the host once, reject loopback, private, link-local, and metadata ranges, and connect to the vetted address.", "Disable automatic redirects or re-validate each hop; cap response size and do not echo raw responses to the caller."],
+  "safe_tests": ["Point the feature at a local listener on 127.0.0.1 and confirm the request is refused.", "Use a hostname that resolves to a private or link-local address and confirm it is refused, including through a redirect.", "Request an allowed host on a non-standard port (for example :6379 or :22) and confirm it is refused."],
+  "remediation": ["Prefer identifiers over URLs: accept a document or integration ID and build the URL server-side.", "Otherwise enforce an allowlist of schemes, hosts, and ports, resolve the host once, reject loopback, private, link-local, and metadata ranges, and connect to the vetted address.", "Disable automatic redirects or re-validate each hop; cap response size and do not echo raw responses to the caller."],
   "references": [{"source": "CWE", "id": "CWE-918", "url": "https://cwe.mitre.org/data/definitions/918.html"}],
   "tags": ["ssrf", "outbound-requests"],
   "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}

@@ -39,10 +39,13 @@ class AgentSecTests(unittest.TestCase):
             "IDOR": "CWE-639", "XSS": "CWE-79", "XXE": "CWE-611", "SSRF": "CWE-918", "CSRF": "CWE-352",
             "prompt injection": "CWE-1427", "race condition": "CWE-362", "sql injection": "CWE-89",
             "os command injection": "CWE-78", "open redirect": "CWE-601", "path traversal": "CWE-22",
+            "JWT": "CWE-347", "CORS": "CWE-942", "timing attack": "CWE-208", "log injection": "CWE-117",
+            "insecure randomness": "CWE-338", "zip slip": "CWE-22", "jwt signature not verified": "CWE-347",
         }
         for query, cwe_id in expected.items():
             with self.subTest(query=query):
                 self.assertEqual(agentsec.search_cwe(query)[0]["entry"]["id"], cwe_id)
+        self.assertEqual(agentsec.search_cwe("zzzzqqq"), [])
 
     def test_rules_must_cite_existing_allowed_cwes(self):
         problems = agentsec.cwe_mapping_problems(["CWE-79", "CWE-20", "CWE-699", "CWE-999999"])
@@ -111,7 +114,7 @@ class AgentSecTests(unittest.TestCase):
         lines = [
             "not json",
             "[1, 2]",
-            json.dumps({"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": "oops"}),
+            json.dumps({"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": 0}),
             json.dumps({"jsonrpc": "2.0", "method": "notifications/initialized"}),
             "",
             json.dumps({"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "agentsec_get_cwe", "arguments": {"cwe_id": "nope"}}}),
@@ -121,6 +124,8 @@ class AgentSecTests(unittest.TestCase):
             [sys.executable, str(PROJECT_ROOT / "tools" / "agentsec.py"), "serve"],
             input="\n".join(lines) + "\n", capture_output=True, text=True, timeout=60,
         )
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertEqual(completed.stderr, "")
         replies = [json.loads(line) for line in completed.stdout.splitlines()]
         self.assertEqual([reply.get("error", {}).get("code") for reply in replies[:3]], [-32700, -32600, -32602])
         self.assertEqual(replies[0]["id"], None)

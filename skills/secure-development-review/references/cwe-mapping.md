@@ -49,7 +49,8 @@ Every search hit and entry carries MITRE's vulnerability-mapping usage:
 | Code pattern | Usual root cause |
 |---|---|
 | String-built SQL with request data | CWE-89 |
-| `shell=True` / `exec()` with user data | CWE-78 |
+| Shell or OS command built from user data (`shell=True`, `os.system`, Node `child_process.exec`) | CWE-78 |
+| Language-level `eval()` / Python `exec()` of user data | CWE-95 (eval injection) or CWE-94 |
 | Unescaped user data in HTML or DOM | CWE-79 |
 | User-controlled file path | CWE-22 |
 | Handler with no permission check | CWE-862 (no check) or CWE-863 (wrong check) |
@@ -61,5 +62,6 @@ Every search hit and entry carries MITRE's vulnerability-mapping usage:
 | Secrets or PII written to logs | CWE-532 |
 | Password stored with a fast hash | CWE-916 |
 
-Always confirm the entry with `agentsec_get_cwe` before reporting. This table
-is a starting point, not a substitute.
+Look up every entry before reporting. This table is a starting point, not a
+substitute. If the knowledge base is unavailable, still report the finding,
+but label its CWE `(unverified)`.

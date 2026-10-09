@@ -7,9 +7,16 @@ regressions. Showing that an attack is possible against something live is out of
 
 Without asking, you may:
 - write unit and integration tests in the user's project using synthetic data
-- run the project's own test suite, linters, type checkers, and local SAST/SCA
-  tools (`semgrep`, `bandit`, `npm audit`, `pip-audit`, `gitleaks`, `trivy fs`)
-- start the app locally (localhost, a dev container) and send requests to it
+- run the project's own test suite, linters, type checkers, and offline scanners
+  such as `bandit`, `gitleaks`, or `semgrep` with local rule files
+- start the app locally with synthetic data and send requests to it, when its
+  configuration points only at local or mock services
+
+Tell the user before running tools that contact external services. `npm audit`,
+`pip-audit`, and `osv-scanner` send dependency names and versions to public
+vulnerability databases. `trivy` downloads its database, and `semgrep --config
+auto` fetches rules from a registry. If starting the app would reach real
+third-party services, a shared database, or real credentials, ask first.
 
 Ask first, and get the target, owner, time window, and rate limits in writing, before:
 - sending traffic to any deployed environment (staging, preview URLs, prod)
@@ -25,11 +32,11 @@ Each test asserts that the **control** holds:
 | Weakness | Test asserts |
 |---|---|
 | CWE-89 SQL injection | input containing `' OR '1'='1` is treated as a literal value; the query is parameterized |
-| CWE-79 XSS | `<script>` and `"onmouseover=` in user fields render escaped in the response |
+| CWE-79 XSS | user input stays inert in every sink it reaches: HTML text, attributes, URLs, inline scripts. Each sink needs encoding for its context, so test each one separately |
 | CWE-22 path traversal | `../`, absolute paths, and encoded variants are rejected or contained |
-| CWE-862/639 authz / IDOR | user B gets 403/404 for user A's object ID on every verb |
+| CWE-862/639 authz / IDOR | for every verb the endpoint supports, user B using user A's object ID gets no A data in the body and causes no side effect (403/404 is typical) |
 | CWE-918 SSRF | URLs resolving to loopback, link-local (169.254.x), or private ranges are refused, including after redirects |
-| CWE-352 CSRF | a state-changing request without a valid token or same-site origin is refused |
+| CWE-352 CSRF | a state-changing request from an untrusted origin without a valid token is refused. SameSite is not an origin check, because sibling subdomains count as same-site, so validate the exact trusted origins as well |
 | CWE-307 brute force | the Nth failed login is throttled or locked |
 | CWE-502 deserialization | untrusted input is never passed to an unsafe loader (unit test or lint rule) |
 | CWE-798 secrets | a secret scanner runs in CI and the repo is clean |

@@ -2,7 +2,7 @@
 
 Use this to decide where to look. Skip domains that don't apply to the stack.
 For each domain, `agentsec_search_cwe` with the listed terms finds candidate
-entries. Start discovery from the views: CWE-699 (Software Development), CWE-1003 (Simplified Mapping), CWE-1435 (2025 Top 25), and CWE-1448 for AI/ML. Get a view with `sections: ["Members"]` to list its member weaknesses.
+entries. Start discovery from the views: CWE-699 (Software Development), CWE-1003 (Simplified Mapping), CWE-1435 (2025 Top 25), and CWE-1448 for AI/ML. Get a view with `sections: ["Members"]` to list its members. Many views list categories rather than weaknesses (CWE-1448 lists only CWE-1446 and CWE-1447), so fetch each category with `sections: ["Relationships"]` to reach the actual weaknesses.
 
 ## Contents
 - Input and injection
@@ -37,7 +37,7 @@ Search: `missing authorization`, `incorrect authorization`, `user-controlled key
 Check password storage, login rate limiting, reset and recovery flows, MFA
 bypasses, session fixation and rotation, JWT validation (alg, exp, aud,
 signature), and cookie flags (HttpOnly, Secure, SameSite).
-Search: `authentication`, `session fixation`, `password hash`, `JWT`, `cookie`.
+Search: `authentication`, `session fixation`, `password hash`, `JWT` (finds CWE-347), `cookie`.
 
 ## Secrets and sensitive data
 Check hard-coded keys, `.env` committed to git, secrets in client bundles,
@@ -60,7 +60,7 @@ Check output encoding per context, raw-HTML sinks (`innerHTML`,
 `dangerouslySetInnerHTML`, `|safe`, `v-html`), CSRF on cookie-auth state
 changes, open redirects, CORS with credentials and wildcard or reflected
 origin, and missing CSP or clickjacking headers.
-Search: `cross-site scripting`, `CSRF`, `open redirect`, `CORS`.
+Search: `cross-site scripting`, `CSRF`, `open redirect`, `CORS` (finds CWE-942).
 
 ## Outbound requests
 Check server-side fetches of user-supplied URLs (webhooks, previews,

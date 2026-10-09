@@ -21,9 +21,12 @@ Prefer the MCP tools from the `unofficial_cwe_agentsec_kb` server:
 | `agentsec_review_path` | fast heuristic scan of a local directory, for leads only |
 | `agentsec_cwe_status` / `agentsec_validate_kb` | confirm the data pack is present and intact |
 
-If the tools are missing, use the CLI with the same functions:
-`python3 "${CLAUDE_PLUGIN_ROOT}/tools/agentsec.py" cwe-search "<text>"`, and
-likewise `cwe-get CWE-89 --section Mapping_Notes`, `query`, `get`, `review <dir>`.
+If the tools are missing, use the CLI with the same functions. The plugin root
+is `${CLAUDE_PLUGIN_ROOT}` in Claude Code. In other hosts it's two directories
+above this skill's folder.
+`python3 "<plugin root>/tools/agentsec.py" cwe-search "<text>"`, and likewise
+`cwe-get CWE-89 --section Description --section Mapping_Notes`, `query`, `get`,
+`review <dir>`.
 If neither works, run the `setup` skill rather than citing CWE from memory.
 
 ## Pick the mode

@@ -238,7 +238,10 @@ def validate_rules() -> dict[str, Any]:
         mappings = json.loads(mapping_path.read_text(encoding="utf-8"))["mappings"]
         mapped: dict[str, set[str]] = {}
         for entry in mappings:
-            mapped.setdefault(entry["rule_id"], set()).add(entry["cwe_id"])
+            pairs = mapped.setdefault(entry["rule_id"], set())
+            if entry["cwe_id"] in pairs:
+                errors.append({"path": "mappings/cwe.json", "error": f"duplicate mapping {entry['rule_id']} -> {entry['cwe_id']}"})
+            pairs.add(entry["cwe_id"])
         for rule_id in sorted(seen_ids):
             if rule_id not in mapped:
                 errors.append({"path": "mappings/cwe.json", "error": f"missing mapping for {rule_id}"})
@@ -319,11 +322,26 @@ def get_rule(rule_id: str) -> dict[str, Any] | None:
     return None
 
 
+# Everyday terms MITRE's alternate terms don't cover, mapped to the allowed entry a reviewer usually means.
+SEARCH_ALIASES = {
+    "jwt": ("CWE-347",),
+    "token signature": ("CWE-347",),
+    "cors": ("CWE-942",),
+    "timing attack": ("CWE-208",),
+    "log injection": ("CWE-117",),
+    "log forging": ("CWE-117",),
+    "insecure randomness": ("CWE-338",),
+    "weak random": ("CWE-338",),
+    "zip slip": ("CWE-22",),
+}
+
+
 def search_cwe(query: str, limit: int = 10) -> list[dict[str, Any]]:
     normalized_query = query.strip().upper()
     phrase = query.strip().lower()
     terms = {term.lower() for term in re.findall(r"[a-zA-Z0-9_-]+", query) if len(term) > 1}
     alternate_terms = cwe_alternate_terms()
+    aliased = {cwe_id for alias, ids in SEARCH_ALIASES.items() if re.search(rf"(?<![a-z0-9]){alias}(?![a-z0-9])", phrase) for cwe_id in ids}
     scored: list[tuple[int, dict[str, Any]]] = []
     for entry in load_cwe_index():
         # MITRE's alternate terms carry the shorthand people search with: XSS, IDOR, XXE, prompt injection.
@@ -337,12 +355,15 @@ def search_cwe(query: str, limit: int = 10) -> list[dict[str, Any]]:
         nickname = re.search(r"\('([^']+)'\)", str(entry.get("name") or ""))
         if nickname and nickname.group(1).lower() == phrase:
             score += 5
-        if entry.get("status") in {"Deprecated", "Obsolete"}:
-            score -= 5
         if entry["id"].upper() == normalized_query:
             score += 100
-        if score:
-            scored.append((score, entry))
+        if entry["id"] in aliased:
+            score += 10
+        if score <= 0:
+            continue
+        if entry.get("status") in {"Deprecated", "Obsolete"}:
+            score = max(score - 5, 1)  # still listed when it matches, but ranked below current entries
+        scored.append((score, entry))
     # Ties favor Base weaknesses, the abstraction MITRE prefers for root-cause mapping.
     abstraction_rank = {"Base": 0, "Variant": 1, "Class": 2, "Compound": 3, "Pillar": 4}
     scored.sort(key=lambda item: (-item[0], abstraction_rank.get(item[1].get("abstraction"), 5), item[1]["id"]))
@@ -623,7 +644,7 @@ def serve() -> int:
             request = parsed
             method = request.get("method")
             message_id = request.get("id")
-            params = request.get("params") or {}
+            params = request["params"] if "params" in request else {}
             if not isinstance(params, dict):
                 mcp_response(message_id, error={"code": -32602, "message": "params must be an object"})
                 continue

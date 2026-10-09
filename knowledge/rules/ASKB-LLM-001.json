@@ -1,14 +1,14 @@
 {
   "id": "ASKB-LLM-001",
-  "title": "Keep untrusted content out of the instruction channel of LLM prompts",
+  "title": "Neutralize untrusted content when constructing LLM prompts",
   "status": "stable",
-  "summary": "Text from users, retrieved documents, web pages, files, and tool results must be treated as data when building prompts, because an LLM cannot reliably tell embedded instructions from intended ones.",
+  "summary": "When an application builds a prompt, text from users, retrieved documents, web pages, files, and tool results must be kept distinguishable from instructions, because an LLM cannot reliably tell embedded instructions from intended ones.",
   "applies_to": ["ai-agent", "llm-application", "rag"],
   "cwe_ids": ["CWE-1427"],
   "risk": "high",
-  "review_checks": ["Trace every input that reaches a system prompt, developer prompt, or tool description.", "Check whether retrieved or fetched content and tool results are passed back to the model without separation or labeling.", "Identify what the model can do if injected instructions succeed: tools, data access, outbound requests."],
+  "review_checks": ["Trace every input that reaches a system prompt, developer prompt, or tool description.", "Check whether retrieved or fetched content and tool results are passed back to the model without separation or labeling.", "Identify what the model can do if injected instructions succeed: tools, data access, outbound requests.", "Confirm the root cause before mapping to CWE-1427. If the core problem is trusting a third-party source that should not be trusted (some indirect injection), placing sensitive data in the prompt, or jailbreaking, map that weakness instead, as the CWE-1427 mapping notes advise."],
   "safe_tests": ["In a local build with stubbed tools, run a set of benign injection phrases through user input and through retrieved content, repeating each several times because model output is non-deterministic.", "Confirm that no tool call or data access outside the user's own scope occurs, whatever the model output."],
-  "remediation": ["Place untrusted text only in user or tool-result turns, clearly delimited and labeled as untrusted data.", "Assume injection will sometimes succeed: enforce authorization and argument validation in code around every tool, not in the prompt.", "Require human confirmation for high-impact actions and limit what retrieved content can trigger."],
+  "remediation": ["Delimit and label untrusted text, and keep it out of system and developer instructions. Message roles and delimiters reduce confusion but are not a security boundary, because models can still follow instructions found in user or tool-result content.", "Assume injection will sometimes succeed: enforce authorization and argument validation in code around every tool, outside the prompt.", "Require human confirmation for high-impact actions and limit what retrieved content can trigger."],
   "references": [{"source": "CWE", "id": "CWE-1427", "url": "https://cwe.mitre.org/data/definitions/1427.html"}],
   "tags": ["llm", "prompt-injection", "ai-agent"],
   "provenance": {"origin": "original", "last_reviewed": "2026-10-09"}

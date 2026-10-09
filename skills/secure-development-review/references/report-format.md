@@ -7,7 +7,7 @@ Then list findings, most severe first:
 
 ```text
 [Severity] Title — confidence: High|Medium|Low — status: Confirmed|Probable|Needs Review
-CWE: CWE-<id> <name> (mapping_usage: Allowed)   |   Rule: ASKB-…  (if one applies)
+CWE: CWE-<id> <name> (mapping_usage: <value from lookup>)   |   Rule: ASKB-…  (if one applies)
      ↑ name and usage copied from the KB lookup; write "(unverified)" if you couldn't look it up
 Evidence: path/to/file.py:42-47 — short, redacted snippet or data-flow summary
 Root cause: the missing or incorrect control
@@ -32,7 +32,7 @@ If there are no confirmed findings, say what was checked and why it holds up.
 ## Machine-readable output
 
 When the user wants JSON (CI, ticket import), emit objects matching
-`schemas/finding.schema.json` in the plugin root (`${CLAUDE_PLUGIN_ROOT}`). Its
-fields are `rule_id`, `cwe_ids`, `title`, `severity`, `confidence`, `evidence{path,line,snippet}`,
+`schemas/finding.schema.json` in the plugin root (see `SKILL.md`). Its
+required fields are `id` (`ASKB-F-0001`, numbered per report), `rule_id`, `cwe_ids`, `title`, `severity`, `confidence`, `evidence{path,line,snippet}`,
 `impact`, `safe_verification[]`, `remediation[]`, and `disposition`. Lowercase
 the severity and confidence values.
